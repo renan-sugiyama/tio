@@ -17,7 +17,7 @@ export default {
   },
 
   // Global CSS (https://go.nuxtjs.dev/config-css)
-  css: ['ant-design-vue/dist/antd.css'],
+  css: ['@/assets/vars/variables.less'],
 
   // Plugins to run before rendering page (https://go.nuxtjs.dev/config-plugins)
   plugins: ['@/plugins/antd-ui'],
@@ -32,8 +32,55 @@ export default {
   ],
 
   // Modules (https://go.nuxtjs.dev/config-modules)
-  modules: [],
+  modules: [
+    '@nuxtjs/style-resources',
+    [
+      '@nuxtjs/firebase',
+      {
+        config: {
+          apiKey: 'AIzaSyCKrfm5MWYcGIg__DKMTal2LsOneG3-s9U',
+          authDomain: 'sugiyama-gestao-pedidos.firebaseapp.com',
+          databaseURL:
+            'https://sugiyama-gestao-pedidos-default-rtdb.firebaseio.com/',
+          projectId: 'sugiyama-gestao-pedidos',
+          storageBucket: 'sugiyama-gestao-pedidos.appspot.com',
+          messagingSenderId: '304187832408',
+          appId: '1:304187832408:web:fcb5e937b7f4d28a79f22d',
+        },
+        services: {
+          auth: {
+            persistence: 'local', // default
+            initialize: {
+              onAuthStateChangedMutation:
+                'admin/ON_AUTH_STATE_CHANGED_MUTATION',
+              onAuthStateChangedAction: 'admin/onAuthStateChangedAction',
+              subscribeManually: false,
+            },
+            ssr: false, // default
+            emulatorPort: 3000,
+            emulatorHost: 'http://localhost',
+          },
+          database: true,
+        },
+      },
+    ],
+  ],
+  styleResources: {
+    less: '@/assets/vars/variables.less',
+  },
 
   // Build Configuration (https://go.nuxtjs.dev/config-build)
-  build: {},
+  build: {
+    loaders: {
+      less: {
+        lessOptions: {
+          javascriptEnabled: true,
+        },
+      },
+    },
+  },
+
+  router: {
+    middleware: 'auth',
+  },
 }

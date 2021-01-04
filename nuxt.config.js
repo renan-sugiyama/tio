@@ -1,3 +1,6 @@
+import path from 'path'
+import fs from 'fs'
+
 export default {
   // Disable server-side rendering (https://go.nuxtjs.dev/ssr-mode)
   ssr: false,
@@ -41,7 +44,7 @@ export default {
           apiKey: 'AIzaSyCKrfm5MWYcGIg__DKMTal2LsOneG3-s9U',
           authDomain: 'sugiyama-gestao-pedidos.firebaseapp.com',
           databaseURL:
-            'https://sugiyama-gestao-pedidos-default-rtdb.firebaseio.com/',
+            'https://sugiyama-gestao-pedidos-default-rtdb.firebaseio.com',
           projectId: 'sugiyama-gestao-pedidos',
           storageBucket: 'sugiyama-gestao-pedidos.appspot.com',
           messagingSenderId: '304187832408',
@@ -56,9 +59,6 @@ export default {
               onAuthStateChangedAction: 'admin/onAuthStateChangedAction',
               subscribeManually: false,
             },
-            ssr: false, // default
-            emulatorPort: 3000,
-            emulatorHost: 'http://localhost',
           },
           database: true,
         },
@@ -82,5 +82,12 @@ export default {
 
   router: {
     middleware: 'auth',
+  },
+
+  server: {
+    https: {
+      key: fs.readFileSync(path.resolve(__dirname, 'localhost.key')),
+      cert: fs.readFileSync(path.resolve(__dirname, 'localhost.crt')),
+    },
   },
 }

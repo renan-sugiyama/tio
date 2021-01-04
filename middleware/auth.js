@@ -1,5 +1,6 @@
 export default function ({ store, redirect, route }) {
-  if (!store.state.user.uid && route.path !== '/') {
-    return redirect('/')
+  const userUid = store.getters['admin/user'].uid
+  if (!userUid && route.path !== '/login') {
+    return redirect('/login')
   }
 }

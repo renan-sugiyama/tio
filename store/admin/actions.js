@@ -1,11 +1,16 @@
+import firebase from 'firebase/app'
+import 'firebase/auth'
+
 export default {
-  onAuthStateChangedAction: (state, { authUser, claims }) => {
+  onAuthStateChangedAction: (ctx, { authUser, claims }) => {
     if (!authUser) {
       // claims = null
       // Perform logout operations
-      console.log('teste')
     } else {
-      console.log('teste1 action')
+      ctx.commit('ON_AUTH_STATE_CHANGED_MUTATION', { authUser })
     }
+  },
+  login: async (_, { email, password }) => {
+    await firebase.auth().signInWithEmailAndPassword(email, password)
   },
 }

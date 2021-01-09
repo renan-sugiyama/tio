@@ -61,6 +61,12 @@ export default {
             },
           },
           database: true,
+          firestore: {
+            enablePersistence: true,
+            settings: {
+              // Firestore Settings - currently only works in SPA mode
+            },
+          },
         },
       },
     ],

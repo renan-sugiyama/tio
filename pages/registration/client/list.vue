@@ -1,150 +1,86 @@
 <template>
   <div>
-    <a-button type="primary">
-      <NuxtLink to="/registration/client">Adicionar</NuxtLink>
-    </a-button>
-    <a-table :columns="columns" :data-source="data" bordered>
-      <template
-        v-for="col in ['name', 'age', 'address']"
-        :slot="col"
-        slot-scope="text, record"
-      >
-        <div :key="col">
-          <a-input
-            v-if="record.editable"
-            style="margin: -5px 0"
-            :value="text"
-            @change="(e) => handleChange(e.target.value, record.key, col)"
-          />
-          <template v-else>
-            {{ text }}
-          </template>
+    <a-list
+      class="demo-loadmore-list"
+      :loading="loading"
+      :pagination="pagination"
+      item-layout="horizontal"
+      :data-source="data"
+    >
+      <a-list-item slot="renderItem" slot-scope="item">
+        <div>
+          <div>Nome: {{ item.name }}</div>
+          <div>Idade: {{ item.age }}</div>
         </div>
-      </template>
-      <template slot="operation" slot-scope="text, record">
-        <div class="editable-row-operations">
-          <span v-if="record.editable">
-            <a @click="() => save(record.key)">Save</a>
-            <a-popconfirm
-              title="Sure to cancel?"
-              @confirm="() => cancel(record.key)"
-            >
-              <a>Cancel</a>
-            </a-popconfirm>
-          </span>
-          <span v-else>
-            <a :disabled="editingKey !== ''" @click="() => edit(record.key)">
-              Edit
-            </a>
-            <NuxtLink
-              :to="{
-                name: 'registration-client-id',
-                params: { id: record.id },
-              }"
-              >Detalhes</NuxtLink
-            >
-          </span>
-        </div>
-      </template>
-    </a-table>
+        <a slot="actions"
+          ><a-button type="link" @click="showEditDrawer(item)"
+            >Editar</a-button
+          ></a
+        >
+        <a slot="actions">more</a>
+      </a-list-item>
+    </a-list>
+    <ClientEditMode
+      :data="editItem"
+      :visible="isDrawerVisible"
+      @close="closeEditDrawer"
+    />
   </div>
 </template>
 <script>
-const columns = [
-  {
-    title: 'name',
-    dataIndex: 'name',
-    width: '25%',
-    scopedSlots: { customRender: 'name' },
-  },
-  {
-    title: 'age',
-    dataIndex: 'age',
-    width: '15%',
-    scopedSlots: { customRender: 'age' },
-  },
-  {
-    title: 'address',
-    dataIndex: 'address',
-    width: '40%',
-    scopedSlots: { customRender: 'address' },
-  },
-  {
-    title: 'operation',
-    dataIndex: 'operation',
-    scopedSlots: { customRender: 'operation' },
-  },
-]
-
-const data = []
-for (let i = 0; i < 100; i++) {
-  data.push({
-    key: i.toString(),
-    id: (i + 1).toString(),
-    name: `Edrward ${i}`,
-    age: 32,
-    address: `London Park no. ${i}`,
-  })
-}
+import ClientEditMode from './../../../components/clients/editMode'
 export default {
+  components: {
+    ClientEditMode,
+  },
   data() {
-    this.cacheData = data.map((item) => ({ ...item }))
     return {
-      data,
-      columns,
-      editingKey: '',
+      loading: true,
+      data: [],
+      isDrawerVisible: false,
+      editItem: {},
+      pagination: {
+        onChange: (page) => {
+          // TODO
+        },
+        pageSize: 3,
+      },
     }
   },
+  async mounted() {
+    await this.getData({
+      offset: 1,
+      limit: 2,
+    })
+  },
   methods: {
-    handleChange(value, key, column) {
-      const newData = [...this.data]
-      const target = newData.filter((item) => key === item.key)[0]
-      if (target) {
-        target[column] = value
-        this.data = newData
+    async getData(params) {
+      try {
+        this.loading = true
+        await this.$store.dispatch('clients/setList', params)
+        this.data = this.$store.getters['clients/list']
+      } catch (error) {
+        // TODO
+      } finally {
+        this.loading = false
       }
     },
-    edit(key) {
-      const newData = [...this.data]
-      const target = newData.filter((item) => key === item.key)[0]
-      this.editingKey = key
-      if (target) {
-        target.editable = true
-        this.data = newData
-      }
+    showEditDrawer(item) {
+      this.editItem = item
+      this.isDrawerVisible = true
     },
-    save(key) {
-      const newData = [...this.data]
-      const newCacheData = [...this.cacheData]
-      const target = newData.filter((item) => key === item.key)[0]
-      const targetCache = newCacheData.filter((item) => key === item.key)[0]
-      if (target && targetCache) {
-        delete target.editable
-        this.data = newData
-        Object.assign(targetCache, target)
-        this.cacheData = newCacheData
-      }
-      this.editingKey = ''
-    },
-    cancel(key) {
-      const newData = [...this.data]
-      const target = newData.filter((item) => key === item.key)[0]
-      this.editingKey = ''
-      if (target) {
-        Object.assign(
-          target,
-          this.cacheData.filter((item) => key === item.key)[0]
-        )
-        delete target.editable
-        this.data = newData
+    closeEditDrawer(values) {
+      this.editItem = {}
+      this.isDrawerVisible = false
+      if (values) {
+        this.getData()
       }
     },
   },
 }
 </script>
-
-<style scoped>
-.editable-row-operations a {
-  margin-right: 8px;
+<style>
+.demo-loadmore-list {
+  min-height: 350px;
 }
 </style>

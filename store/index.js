@@ -7,9 +7,9 @@ export const mutations = {
     if (!authUser) {
       // claims = null
       // perform logout operations
-      console.log('mutations 1')
+      // TODO entender
     } else {
-      console.log('mutations 2')
+      // TODO entender
       // Do something with the authUser and the claims object...
     }
   },
@@ -18,31 +18,24 @@ export const mutations = {
 export const actions = {
   async nuxtServerInit({ dispatch }, ctx) {
     // INFO -> Nuxt-fire Objects can be accessed in nuxtServerInit action via this.$fire___, ctx.$fire___ and ctx.app.$fire___'
-    console.log('sadklçfjçlasdfjçlsdjaçf')
     /** Get the VERIFIED authUser on the server */
     if (ctx.res && ctx.res.locals && ctx.res.locals.user) {
       const { allClaims: claims, ...authUser } = ctx.res.locals.user
-
-      console.info(
-        'Auth User verified on server-side. User: ',
-        authUser,
-        'Claims:',
-        claims
-      )
-
+      // TODO entender
       await dispatch('onAuthStateChangedAction', {
         authUser,
         claims,
       })
     }
   },
+
   onAuthStateChangedAction: (state, { authUser, claims }) => {
     if (!authUser) {
+      // TODO entender
       // claims = null
       // Perform logout operations
-      console.log('teste')
     } else {
-      console.log('teste1 action')
+      // TODO entender
     }
   },
 }

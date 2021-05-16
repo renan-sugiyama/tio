@@ -1,7 +1,8 @@
 <template>
+  <!-- TODO handle width when is mobile -->
   <a-drawer
     :title="title"
-    :width="width"
+    :width="isMobile ? '100%' : width"
     :visible="visible"
     :body-style="{ paddingBottom: '80px' }"
     @close="$emit('close')"
@@ -31,6 +32,8 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
+
 export default {
   name: 'DrawerForm',
   props: {
@@ -50,6 +53,12 @@ export default {
       type: Function,
       default: () => ({}),
     },
+  },
+
+  computed: {
+    ...mapGetters({
+      isMobile: 'configs/isMobile',
+    }),
   },
 }
 </script>

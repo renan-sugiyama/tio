@@ -17,6 +17,7 @@
 </template>
 
 <script>
+import { mapActions } from 'vuex'
 import TheSidebar from '../components/TheSidebar.vue'
 
 export default {
@@ -25,6 +26,24 @@ export default {
     return {
       collapsed: true,
     }
+  },
+  beforeMount() {
+    this.setIsMobile()
+  },
+  mounted() {
+    this.$nextTick(() => {
+      window.addEventListener('resize', this.setIsMobile)
+    })
+  },
+
+  beforeDestroy() {
+    window.removeEventListener('resize', this.setIsMobile)
+  },
+
+  methods: {
+    ...mapActions({
+      setIsMobile: 'configs/setIsMobile',
+    }),
   },
 }
 </script>

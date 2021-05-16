@@ -1,3 +1,3 @@
-export default {
-  list: (state) => state.list,
-}
+// export default {
+//   list: (state) => state.list,
+// }

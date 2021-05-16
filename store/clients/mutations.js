@@ -1,5 +1,5 @@
-export default {
-  setList: (state, payload) => {
-    state.list = payload
-  },
-}
+// export default {
+//   setList: (state, payload) => {
+//     state.list = payload
+//   },
+// }

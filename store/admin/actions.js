@@ -4,6 +4,7 @@ import 'firebase/auth'
 export default {
   onAuthStateChangedAction: (ctx, { authUser, claims }) => {
     if (!authUser) {
+      // TODO - clean all and go to login page
       // claims = null
       // Perform logout operations
     } else {

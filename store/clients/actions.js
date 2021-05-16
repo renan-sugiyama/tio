@@ -1,47 +1,21 @@
-import firebase from 'firebase/app'
-import 'firebase/auth'
+// import FirebaseService from './../../service/firebase'
 
-export default {
-  setList: async (ctx, params = {}) => {
-    // const dataQuery = firebase
-    //   .database()
-    //   .ref('clients')
-    //   // .limitToLast(params?.limit || 10)
-    //   .orderByChild('name')
-    //   .startAt()
-    // const dataList = await dataQuery.once('value')
-    // const dataListValues = []
-    // dataList.forEach((item) => {
-    //   console.log(item.key)
-    //   console.log(item.val)
-    //   dataListValues.push({ ...item.val(), key: item.key })
-    // })
+// export default {
+//   setList: async (
+//     ctx,
+//     { orderBy = 'updatedAt', orderDirection = 'desc', page = 0, limit = 10 }
+//   ) => {
+//     const dataListValues = await FirebaseService.getList('clients', {
+//       orderBy,
+//       orderDirection,
+//       page,
+//       limit,
+//     })
+//     ctx.commit('setList', dataListValues)
+//   },
 
-    const db = firebase.firestore()
-    const dataRef = db.collection('clients')
-    const dataQuery = dataRef.orderBy('name').startAt(2).limit(2)
-    const dataList = await dataQuery.get()
-    const dataListValues = []
-    dataList.forEach((doc) => {
-      dataListValues.push({ ...doc.data(), id: doc.id })
-    })
-    ctx.commit('setList', dataListValues)
-  },
-  createItem: async (ctx, { name, age }) => {
-    const dataQuery = firebase.database().ref('clients')
-    const teste = await dataQuery.push()
-    teste.set({
-      name,
-      age,
-    })
-  },
-  editItem: async (ctx, { name, age, key }) => {
-    await firebase
-      .database()
-      .ref('clients/' + key)
-      .set({
-        name,
-        age,
-      })
-  },
-}
+//   // TODO remover esse método e colocar no lugar que precisar
+//   getItemById: async (ctx, { id }) => {
+//     await FirebaseService.getItemById('clients', id)
+//   },
+// }

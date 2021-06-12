@@ -4,27 +4,22 @@ import 'firebase/auth'
 class FirebaseService {
   static async getList(
     collection,
-    { orderBy = 'updatedAt', orderDirection = 'asc', page = 0, limit = 10 }
+    { orderBy = 'updatedAt', orderDirection = 'asc', page = 0, limit = 10 },
+    filters = []
   ) {
     const db = firebase.firestore()
-    let collectionRef = null
+    let collectionRef = db.collection(collection)
+    filters.forEach((filter) => {
+      collectionRef = collectionRef.where(
+        filter.prop,
+        filter.operator,
+        filter.value
+      )
+    })
+    collectionRef = collectionRef.orderBy(orderBy, orderDirection).limit(limit)
+
     if (orderDirection === 'desc' && page !== 0) {
-      collectionRef = db
-        .collection(collection)
-        .orderBy(orderBy, orderDirection)
-        .limit(limit)
-        .startAfter(page)
-    } else if (orderDirection === 'desc') {
-      collectionRef = db
-        .collection(collection)
-        .orderBy(orderBy, orderDirection)
-        .limit(limit)
-    } else {
-      collectionRef = db
-        .collection(collection)
-        .orderBy(orderBy, orderDirection)
-        .limit(limit)
-        .startAfter(page)
+      collectionRef = collectionRef.startAfter(page)
     }
 
     try {
@@ -43,6 +38,7 @@ class FirebaseService {
       }
     } catch (error) {
       // TODO?
+      console.log(error)
     }
   }
 

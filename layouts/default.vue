@@ -10,7 +10,9 @@
         />
       </a-layout-header>
       <a-layout-content>
-        <Nuxt />
+        <div class="layout-content">
+          <Nuxt />
+        </div>
       </a-layout-content>
     </a-layout>
   </a-layout>
@@ -24,7 +26,7 @@ export default {
   components: { TheSidebar },
   data() {
     return {
-      collapsed: true,
+      collapsed: false,
     }
   },
   beforeMount() {
@@ -70,5 +72,6 @@ export default {
 
 #default-layout .ant-layout-content {
   min-height: calc(100vh - @layout-header-height - @layout-footer-height);
+  padding: 0 5px;
 }
 </style>

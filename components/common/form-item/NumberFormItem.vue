@@ -1,6 +1,7 @@
 <template>
-  <a-form-item :label="label">
+  <a-form-item :label="label" class="number-form-item">
     <a-input-number
+      class="input"
       v-decorator="[
         decorator,
         {
@@ -10,6 +11,7 @@
       ]"
       :min="min"
       :max="max"
+      :precision="precision"
     />
   </a-form-item>
 </template>
@@ -50,6 +52,18 @@ export default {
       type: Number,
       default: Infinity,
     },
+    precision: {
+      type: Number,
+      default: null,
+    },
   },
 }
 </script>
+
+<style lang="less" scoped>
+.number-form-item {
+  .input {
+    width: 100%;
+  }
+}
+</style>

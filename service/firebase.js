@@ -75,6 +75,18 @@ class FirebaseService {
     const db = firebase.firestore()
     await db.collection(collection).doc(id).delete()
   }
+
+  static async getAllOnce(collection) {
+    const db = firebase.firestore()
+    const docRef = db.collection(collection)
+    const querySnapshot = await docRef.get()
+
+    const list = []
+    querySnapshot.forEach((doc) => {
+      list.push({ ...doc.data(), id: doc.id })
+    })
+    return list
+  }
 }
 
 export default FirebaseService

@@ -6,6 +6,7 @@
     class="the-sidebar"
   >
     <div class="logo" />
+    <!-- TODO default-selected-keys based on url-->
     <a-menu
       :default-selected-keys="['1']"
       mode="inline"
@@ -16,28 +17,40 @@
       <a-menu-item key="1">
         <a-icon type="pie-chart" />
         <span>
-          <NuxtLink to="/registration/client/list">Clientes</NuxtLink>
+          <NuxtLink to="/registration/client/list" class="sidebar-item"
+            >TODO Clientes</NuxtLink
+          >
         </span>
       </a-menu-item>
+
       <a-menu-item key="2">
         <a-icon type="desktop" />
-        <span>Option 2</span>
+        <span>
+          <NuxtLink to="/registration/product/list" class="sidebar-item"
+            >TODO Produtos</NuxtLink
+          >
+        </span>
       </a-menu-item>
+
       <a-menu-item key="3">
         <a-icon type="inbox" />
         <span>Option 3</span>
       </a-menu-item>
+
       <a-sub-menu key="sub1">
         <span slot="title"><a-icon type="mail" /><span>Cadastro</span></span>
-        <a-menu-item key="5"> aaaaaaaaaaaa </a-menu-item>
+        <a-menu-item key="5"> OPTION 5 </a-menu-item>
         <a-menu-item key="6"> Option 6 </a-menu-item>
       </a-sub-menu>
+
       <a-sub-menu key="sub2">
         <span slot="title"
           ><a-icon type="appstore" /><span>Navigation Two</span></span
         >
         <a-menu-item key="9"> Option 9 </a-menu-item>
+
         <a-menu-item key="10"> Option 10 </a-menu-item>
+
         <a-sub-menu key="sub3" title="Submenu">
           <a-menu-item key="11"> Option 11 </a-menu-item>
           <a-menu-item key="12"> Option 12 </a-menu-item>
@@ -58,6 +71,7 @@ export default {
   },
   methods: {
     teste({ item, key, keyPath }) {
+      // TODO APAGAR
       console.log(item)
       console.log(key)
       console.log(keyPath)
@@ -72,6 +86,10 @@ export default {
     height: 32px;
     background: rgba(255, 255, 255, 0.2);
     margin: 16px;
+  }
+
+  .sidebar-item {
+    color: @sidebar-font-color;
   }
 }
 </style>

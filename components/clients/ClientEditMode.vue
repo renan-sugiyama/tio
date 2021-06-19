@@ -2,43 +2,66 @@
   <div>
     <DrawerForm
       :handle-submit="handleSubmit"
-      title="usuarios"
+      title="TODO usuarios"
       :visible="visible"
       @close="$emit('close')"
     >
       <template slot="content">
         <a-form :form="form" layout="vertical" hide-required-mark>
           <a-row :gutter="16">
-            <a-col :span="12">
-              <a-form-item label="Name">
-                <a-input
-                  v-decorator="[
-                    'name',
-                    {
-                      initialValue: data.name,
-                      rules: [
-                        { required: true, message: 'Please enter user name' },
-                      ],
-                    },
-                  ]"
-                  placeholder="Please enter user name"
-                />
-              </a-form-item>
+            <a-col :span="24">
+              <TextFormItem
+                :initial-value="data.name"
+                decorator="name"
+                label="TODO Client name"
+                placeholder="TODO Client Name"
+                required
+                message="TODO Please enter user name"
+              />
             </a-col>
-            <a-col :span="12">
-              <a-form-item label="Idade">
-                <a-input-number
-                  v-decorator="[
-                    'age',
-                    {
-                      initialValue: data.age,
-                      rules: [{ required: true, message: 'please enter url' }],
-                    },
-                  ]"
-                  :min="1"
-                  :max="10"
-                />
-              </a-form-item>
+
+            <a-col :span="24">
+              <TextFormItem
+                :initial-value="data.phoneNumber"
+                decorator="phoneNumber"
+                label="TODO Client phoneNumber"
+                placeholder="TODO Client phoneNumber"
+                required
+                message="TODO Please enter user phoneNumber"
+              />
+            </a-col>
+
+            <a-col :span="24">
+              <TextFormItem
+                :initial-value="data.address"
+                decorator="address"
+                label="TODO Client address"
+                placeholder="TODO Client address"
+                required
+                message="TODO Please enter user address"
+              />
+            </a-col>
+
+            <a-col :span="24">
+              <TextFormItem
+                :initial-value="data.email"
+                decorator="email"
+                label="TODO Client email"
+                placeholder="TODO Client email"
+                :required="false"
+                message="TODO Please enter user email"
+              />
+            </a-col>
+
+            <a-col :span="24">
+              <TextFormItem
+                :initial-value="data.documentNumber"
+                decorator="documentNumber"
+                label="TODO Client documentNumber"
+                placeholder="TODO Client documentNumber"
+                :required="false"
+                message="TODO Please enter user documentNumber"
+              />
             </a-col>
           </a-row>
         </a-form>
@@ -49,11 +72,13 @@
 
 <script>
 import FirebaseService from '~/service/firebase'
+import TextFormItem from '~/components/common/form-item/TextFormItem'
 import DrawerForm from '~/components/common/DrawerForm'
 
 export default {
   name: 'ClientEditMode',
   components: {
+    TextFormItem,
     DrawerForm,
   },
   props: {

@@ -3,13 +3,37 @@
     <div class="filters">
       <a-row :gutter="16" class="selectors">
         <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
-          <TextInputFilter v-model="filtersOptions.clientName" title="name" />
+          <TextInputFilter
+            v-model="filtersOptions.clientName"
+            title="TODO name"
+          />
         </a-col>
+
         <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
-          <NumberInputFilter
-            v-model="filtersOptions.clientAge"
-            :min="0"
-            title="age"
+          <TextInputFilter
+            v-model="filtersOptions.clientPhoneNumber"
+            title="TODO phoneNumber"
+          />
+        </a-col>
+
+        <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
+          <TextInputFilter
+            v-model="filtersOptions.clientEmail"
+            title="TODO email"
+          />
+        </a-col>
+
+        <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
+          <TextInputFilter
+            v-model="filtersOptions.clientAddress"
+            title="TODO address"
+          />
+        </a-col>
+
+        <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
+          <TextInputFilter
+            v-model="filtersOptions.clientDocumentNumber"
+            title="TODO documentNumber"
           />
         </a-col>
       </a-row>
@@ -29,14 +53,11 @@
       collection="clients"
       :filters="filters"
       :header-actions="headerActions"
-      table-title="Lista de clientes"
+      table-title="TODO Lista de clientes"
       @edit="showEditDrawer"
     >
       <template v-slot:item="{ item }">
-        <div>
-          <div>Nome: {{ item.name }}</div>
-          <div>Idade: {{ item.age }}</div>
-        </div>
+        <ClientCard :client="item" />
       </template>
     </TheTableList>
 
@@ -50,12 +71,14 @@
 </template>
 
 <script>
+import ClientCard from '~/components/clients/ClientCard'
 import ClientEditMode from '~/components/clients/ClientEditMode'
 import TheTableList from '~/components/common/TheTableList'
 import TextInputFilter from '~/components/common/filters/TextInputFilter'
 
 export default {
   components: {
+    ClientCard,
     ClientEditMode,
     TheTableList,
     TextInputFilter,
@@ -68,7 +91,10 @@ export default {
       filters: [],
       filtersOptions: {
         clientName: '',
-        clientAge: 0,
+        clientPhoneNumber: '',
+        clientEmail: '',
+        clientAddress: '',
+        clientDocumentNumber: '',
       },
       headerActions: [
         {
@@ -114,13 +140,35 @@ export default {
           value: this.filtersOptions.clientName,
         })
       }
-      if (this.filtersOptions.clientAge) {
+      if (this.filtersOptions.clientPhoneNumber) {
         newFilters.push({
-          prop: 'age',
+          prop: 'phoneNumber',
           operator: '==',
-          value: this.filtersOptions.clientAge,
+          value: this.filtersOptions.clientPhoneNumber,
         })
       }
+      if (this.filtersOptions.clientEmail) {
+        newFilters.push({
+          prop: 'email',
+          operator: '==',
+          value: this.filtersOptions.clientEmail,
+        })
+      }
+      if (this.filtersOptions.clientAddress) {
+        newFilters.push({
+          prop: 'address',
+          operator: '==',
+          value: this.filtersOptions.clientAddress,
+        })
+      }
+      if (this.filtersOptions.clientDocumentNumber) {
+        newFilters.push({
+          prop: 'documentNumber',
+          operator: '==',
+          value: this.filtersOptions.clientDocumentNumber,
+        })
+      }
+      console.log('this.filters', this.filters)
       this.filters = newFilters
     },
   },

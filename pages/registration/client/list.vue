@@ -62,6 +62,7 @@
     </TheTableList>
 
     <ClientEditMode
+      v-if="isDrawerVisible"
       :data="editItem"
       :visible="isDrawerVisible"
       @close="closeEditDrawer"

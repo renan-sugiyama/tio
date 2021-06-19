@@ -1,0 +1,16 @@
+TODO
+- cadastro de pedidos
+- inserir no banco de dados os locais de produção (cozinha, balcão, lab, etc)
+- utilizar cloud function para validar criação/edição de itens
+- remover chamada de get após criar, editar ou deletar um item
+- sidebar
+- modo table?
+- verificar funcionamento dos índices do firestone
+
+
+links úteis:
+FIREBASE
+https://firebase.google.com/docs/firestore
+
+ANT DESIGN VUE
+https://www.antdv.com/components/button/

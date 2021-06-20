@@ -9,6 +9,7 @@
         },
       ]"
       :placeholder="placeholder"
+      @change="$emit('change', $event)"
     />
   </a-form-item>
 </template>

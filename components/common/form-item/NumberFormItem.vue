@@ -1,7 +1,6 @@
 <template>
   <a-form-item :label="label" class="number-form-item">
     <a-input-number
-      class="input"
       v-decorator="[
         decorator,
         {
@@ -9,9 +8,13 @@
           rules: [{ required, message }],
         },
       ]"
+      class="input"
       :min="min"
       :max="max"
       :precision="precision"
+      :formatter="formatter"
+      :parser="parser"
+      @change="$emit('change', $event)"
     />
   </a-form-item>
 </template>
@@ -43,6 +46,14 @@ export default {
     message: {
       type: String,
       default: '',
+    },
+    formatter: {
+      type: Function,
+      default: (value) => value,
+    },
+    parser: {
+      type: String,
+      default: (value) => value,
     },
     min: {
       type: Number,

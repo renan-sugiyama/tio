@@ -13,8 +13,8 @@
     >
       <a-select-option
         v-for="option in options"
-        :key="option.name"
-        :value="option.value"
+        :key="option.id || option.name"
+        :value="option.id || option.value"
       >
         {{ option.name }}
       </a-select-option>
@@ -54,9 +54,10 @@ export default {
       type: String,
       default: '',
     },
-    handleSelectChange: {
-      type: Function,
-      default: () => ({}),
+  },
+  methods: {
+    handleSelectChange(value, option) {
+      this.$emit('change', value, option)
     },
   },
 }

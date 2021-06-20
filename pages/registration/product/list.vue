@@ -68,7 +68,7 @@ export default {
       headerActions: [
         {
           click: this.showEditDrawer,
-          label: 'Novo',
+          label: 'TODO Novo',
           icon: 'plus',
         },
       ],

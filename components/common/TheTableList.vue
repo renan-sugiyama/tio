@@ -117,6 +117,7 @@ export default {
           params,
           this.filters
         )
+        console.log('results', results)
         this.dataSource = results
         this.nextPage = nextPage
       } catch (error) {

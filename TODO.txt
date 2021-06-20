@@ -1,5 +1,8 @@
 TODO
 - cadastro de pedidos
+- automatizar order number
+- opção de remover 'produto' do pedido
+- no cadastro do pedido colocar search no produto
 - inserir no banco de dados os locais de produção (cozinha, balcão, lab, etc)
 - utilizar cloud function para validar criação/edição de itens
 - remover chamada de get após criar, editar ou deletar um item

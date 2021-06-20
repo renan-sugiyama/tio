@@ -55,12 +55,14 @@
 import FirebaseService from '~/service/firebase'
 import TextFormItem from '~/components/common/form-item/TextFormItem'
 import NumberFormItem from '~/components/common/form-item/NumberFormItem'
+import SelectFormItem from '~/components/common/form-item/SelectFormItem'
 import DrawerForm from '~/components/common/DrawerForm'
 
 export default {
   name: 'ProductEditMode',
   components: {
     DrawerForm,
+    SelectFormItem,
     TextFormItem,
     NumberFormItem,
   },
@@ -85,6 +87,7 @@ export default {
       this.form = this.$form.createForm(this)
     },
   },
+
   mounted() {
     this.getMeasurementList()
   },

@@ -102,6 +102,14 @@ class FirebaseService {
     })
     return list
   }
+
+  static async incrementCounter(document) {
+    const db = firebase.firestore()
+    const docRef = db.collection('counters').doc(document)
+    await docRef.update('count', firebase.firestore.FieldValue.increment(1))
+    const querySnapshot = await docRef.get()
+    return querySnapshot.data().count
+  }
 }
 
 export default FirebaseService

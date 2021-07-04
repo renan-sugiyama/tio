@@ -129,8 +129,7 @@
                                   updateProductDepartment(
                                     index,
                                     value,
-                                    'department',
-                                    options
+                                    'department'
                                   )
                               "
                             />
@@ -313,7 +312,7 @@ export default {
       form: this.$form.createForm(this),
       userSearchDebounceId: null,
       clientNameSearch: '',
-      totalValue: 0,
+      totalValue: this.data.totalValue || 0,
       initialDeliveryDate: moment(this.data.deliveryDate),
     }
   },
@@ -383,6 +382,7 @@ export default {
         name: department.name,
         id: department.id,
       }))
+      console.log('this.departmentOptions', this.departmentOptions)
     },
 
     getProductDepartment(departmentId) {
@@ -411,11 +411,13 @@ export default {
       )
       products[index] = { ...product }
 
+      console.log('products', products)
+
       this.form.setFieldsValue({
         products,
         [`productQuantity_${index}`]: 1,
         [`productPrice_${index}`]: product.price,
-        [`productDepartment_${index}`]: product.department,
+        [`productDepartment_${index}`]: product.department.name,
       })
 
       this.totalValue = this.getTotalValue(products)
@@ -438,13 +440,16 @@ export default {
       }, 0)
     },
 
-    updateProductDepartment(index, newValue, prop, options) {
+    updateProductDepartment(index, departmentId, prop) {
       const products = this.form.getFieldValue('products')
+      const departmentName = this.departmentOptions.find(
+        (item) => item.id === departmentId
+      ).name
       products[index] = {
         ...products[index],
         [prop]: {
-          name: newValue,
-          id: options.key,
+          name: departmentName,
+          id: departmentId,
         },
       }
       this.form.setFieldsValue({ products })
@@ -487,8 +492,13 @@ export default {
         }
         try {
           this.loading = true
+          let orderNumber = 0
+          if (!this.data?.id) {
+            orderNumber = await FirebaseService.incrementCounter('orders')
+          }
           await FirebaseService.createOrEditItem('orders', {
             id: this.data?.id,
+            orderNumber: this.data.orderNumber || orderNumber,
             ...this.data,
             contactName: values.contactName,
             contactEmail: values.contactEmail,
@@ -497,9 +507,11 @@ export default {
             products: values.products,
             deliveryDate: values.deliveryDate.format('YYYY-MM-DD'),
             note: values.note,
+            totalValue: this.totalValue,
           })
           this.$emit('update')
         } catch (error) {
+          console.log(error)
           this.$message.error(
             `${
               this.data?.id

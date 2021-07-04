@@ -45,7 +45,7 @@ export default {
       default: '',
     },
     autosize: {
-      type: Boolean,
+      type: [Boolean, Object],
       default: true,
     },
     maxLength: {

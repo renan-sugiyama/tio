@@ -73,7 +73,7 @@ import FirebaseService from '~/service/firebase'
 
 const defaultParams = {
   page: 0,
-  limit: 2,
+  limit: 10,
   orderDirection: 'desc',
   orderBy: 'updatedAt',
 }

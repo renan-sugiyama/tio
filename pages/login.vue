@@ -76,32 +76,24 @@ export default {
     this.form = this.$form.createForm(this, { name: 'normal_login' })
   },
   methods: {
-    async login() {
-      try {
-        await this.$store.dispatch('admin/login', {
-          email: 'x@x.com',
-          password: '123456789',
-        })
-        this.$router.push({ path: '/' })
-      } catch (error) {
-        // TODO exibir msg de erro
-        console.log(error)
-      }
-      // this.form.validateFields(async (err, values) => {
-      //   // TODO apagar método de cima e descomentar o de baixo
-      //   if (!err) {
-      //     try {
-      //       // await this.$store.dispatch('admin/login', {
-      //       //   email: values.email,
-      //       //   password: values.password,
-      //       // })
-      //       this.$router.push({ path: '/' })
-      //     } catch (error) {
-      //       // TODO exibir msg de erro
-      //       console.log(error)
-      //     }
-      //   }
-      // })
+    login() {
+      this.form.validateFields(async (err, values) => {
+        if (!err) {
+          try {
+            await this.$store.dispatch('admin/login', {
+              email: values.email,
+              password: values.password,
+            })
+            this.$router.push({ path: '/registration/order/list' })
+          } catch (error) {
+            // TODO exibir msg de erro
+            console.log(error)
+            this.$message.error(
+              'Erro ao fazer login. Verifique usuário e senha'
+            )
+          }
+        }
+      })
     },
   },
 }

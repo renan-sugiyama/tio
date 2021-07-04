@@ -3,11 +3,17 @@
     <div>
       <strong>{{ order.number }}</strong>
     </div>
-    <div>{{ order.contacName || 'TODO sem nome de contato' }}</div>
+    <div>{{ order.contactName || 'TODO sem nome de contato' }}</div>
     <div>{{ order.deliverAddress || 'TODO sem endereço' }}</div>
     <div>{{ order.contactPhone || 'TODO sem telefone' }}</div>
     <div>{{ order.contactEmail || 'TODO sem email' }}</div>
-    <div>{{ (order.products && order.products[0]) || 'TODO sem produto' }}</div>
+    <div v-for="product in order.products" :key="product.id">
+      <div>TODO produto: {{ product.name }}</div>
+      <div>
+        TODO quantidade: {{ product.quantity }} {{ product.measurement }}
+      </div>
+      <div>TODO Preço: ${{ product.price }}</div>
+    </div>
   </div>
 </template>
 

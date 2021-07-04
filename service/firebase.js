@@ -87,6 +87,21 @@ class FirebaseService {
     })
     return list
   }
+
+  static async getAllOnceStartWith(collection, prop, startWithText) {
+    const db = firebase.firestore()
+    const docRef = db
+      .collection(collection)
+      .where(prop, '>=', startWithText)
+      .where(prop, '<=', startWithText + '\uF8FF')
+    const querySnapshot = await docRef.get()
+
+    const list = []
+    querySnapshot.forEach((doc) => {
+      list.push({ ...doc.data(), id: doc.id })
+    })
+    return list
+  }
 }
 
 export default FirebaseService

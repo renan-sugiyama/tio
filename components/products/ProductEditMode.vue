@@ -8,13 +8,25 @@
     >
       <template slot="content">
         <a-form :form="form" layout="vertical" hide-required-mark>
-          <a-row :gutter="8">
-            <a-col :span="24">
+          <a-row :gutter="[8, 16]">
+            <a-col :span="16">
               <TextFormItem
                 :initial-value="data.name"
                 decorator="name"
                 label="TODO Product name"
                 placeholder="TODO Product name"
+                required
+                message="TODO campo obrigatório"
+              />
+            </a-col>
+
+            <a-col :span="8">
+              <SelectFormItem
+                :initial-value="data.departmentId"
+                :options="departments"
+                :decorator="`departmentId`"
+                label="TODO departamento"
+                placeholder="TODO departamento"
                 required
                 message="TODO campo obrigatório"
               />
@@ -74,6 +86,10 @@ export default {
     data: {
       type: Object,
       default: () => ({}),
+    },
+    departments: {
+      type: Array,
+      required: true,
     },
   },
   data() {

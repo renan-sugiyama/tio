@@ -17,3 +17,9 @@ https://firebase.google.com/docs/firestore
 
 ANT DESIGN VUE
 https://www.antdv.com/components/button/
+
+
+criar component de loading
+colocar loading pós login
+
+colocar as unidades de medidas e departamentos na store em vez de consultar na api

@@ -1,5 +1,9 @@
 <template>
-  <a-form-item :label="label" class="number-form-item">
+  <a-form-item
+    :label="label"
+    class="number-form-item"
+    style="padding-bottom: 0; margin-bottom: 0"
+  >
     <a-input-number
       v-decorator="[
         decorator,
@@ -52,7 +56,7 @@ export default {
       default: (value) => value,
     },
     parser: {
-      type: String,
+      type: Function,
       default: (value) => value,
     },
     min: {

@@ -8,7 +8,7 @@
     >
       <template slot="content">
         <a-form :form="form" layout="vertical" hide-required-mark>
-          <a-row :gutter="16">
+          <a-row :gutter="[8, 16]">
             <a-col :span="24">
               <TextFormItem
                 :initial-value="data.name"

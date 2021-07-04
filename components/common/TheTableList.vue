@@ -25,9 +25,10 @@
       </slot>
     </div>
     <a-list
-      class="loadmore-list"
+      :grid="{ gutter: 24, xs: 1, sm: 1, md: 2, lg: 3, xl: 4, xxl: 4 }"
+      class="table-list"
       :loading="loading"
-      item-layout="horizontal"
+      item-layout="vertical"
       :data-source="dataSource"
     >
       <div
@@ -43,17 +44,26 @@
         <a-spin v-if="loadingMore" />
         <a-button v-else @click="onLoadMore"> loading more </a-button>
       </div>
-      <a-list-item slot="renderItem" slot-scope="item">
+      <a-list-item slot="renderItem" slot-scope="item" class="list-item">
         <slot name="item" :item="item" />
         <a slot="actions">
           <a-button type="link" @click="$emit('edit', item)">Editar</a-button>
         </a>
         <a slot="actions">
-          <a-button type="link" @click="deleteItemById(item.id)"
-            >delete
-          </a-button>
+          <a-popconfirm
+            title="TODO tem certeza?"
+            ok-text="TODO Sim"
+            ok-type="danger"
+            cancel-text="TODO Não"
+            @confirm="deleteItemById(item.id)"
+          >
+            <a-button type="link" style="color: #f5222d !important"
+              >delete
+            </a-button>
+          </a-popconfirm>
         </a>
       </a-list-item>
+      <!-- <div slot="footer"></div> -->
     </a-list>
   </div>
 </template>
@@ -170,6 +180,7 @@ export default {
 .header-list {
   display: flex;
   align-items: center;
+  margin-bottom: 8px;
 
   .header-title {
     flex-grow: 1;
@@ -178,7 +189,15 @@ export default {
     color: @primary-color;
   }
 }
-.loadmore-list {
+.table-list {
   min-height: 350px;
+
+  .list-item {
+    & > ::v-deep div {
+      background-color: #fefefe;
+      padding: 8px 12px;
+      border-radius: 12px;
+    }
+  }
 }
 </style>

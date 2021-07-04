@@ -1,11 +1,8 @@
-<template>
-  <div>teste</div>
-</template>
-
 <script>
 export default {
-  mounted() {
-    // console.log('aa', this.$fire.auth.isSignInWithEmailLink())
+  middleware({ redirect }) {
+    // If the user is not authenticated
+    return redirect('/registration/order/list')
   },
 }
 </script>

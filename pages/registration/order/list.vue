@@ -2,18 +2,19 @@
   <div class="list">
     <div class="filters">
       <a-row :gutter="16" class="selectors">
-        <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
+        <!-- TODO -->
+        <!-- <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
           <NumberInputFilter
             v-model="filtersOptions.orderNumber"
             :min="0"
             title="TODO orderNumber"
           />
-        </a-col>
+        </a-col> -->
 
         <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
           <TextInputFilter
-            v-model="filtersOptions.orderContacName"
-            title="TODO orderContacName"
+            v-model="filtersOptions.orderContactName"
+            title="TODO orderContactName"
           />
         </a-col>
       </a-row>
@@ -56,7 +57,7 @@ import OrderCard from '~/components/orders/OrderCard'
 import OrderEditMode from '~/components/orders/OrderEditMode'
 import TheTableList from '~/components/common/TheTableList'
 import TextInputFilter from '~/components/common/filters/TextInputFilter'
-import NumberInputFilter from '~/components/common/filters/NumberInputFilter'
+// import NumberInputFilter from '~/components/common/filters/NumberInputFilter'
 
 export default {
   components: {
@@ -64,7 +65,7 @@ export default {
     OrderEditMode,
     TheTableList,
     TextInputFilter,
-    NumberInputFilter,
+    // NumberInputFilter,
   },
 
   data() {
@@ -74,7 +75,7 @@ export default {
       filters: [],
       filtersOptions: {
         orderNumber: 0,
-        orderContacName: '',
+        orderContactName: '',
       },
       headerActions: [
         {
@@ -111,11 +112,11 @@ export default {
           value: this.filtersOptions.orderNumber,
         })
       }
-      if (this.filtersOptions.orderContacName) {
+      if (this.filtersOptions.orderContactName) {
         newFilters.push({
-          prop: 'contacName',
+          prop: 'contactName',
           operator: '==',
-          value: this.filtersOptions.orderContacName,
+          value: this.filtersOptions.orderContactName,
         })
       }
       this.filters = newFilters

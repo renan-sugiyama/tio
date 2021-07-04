@@ -6,6 +6,9 @@
     <div>
       <span>${{ product.price }} - {{ product.measurement }}</span>
     </div>
+    <div>
+      <span>{{ department }}</span>
+    </div>
   </div>
 </template>
 
@@ -16,6 +19,10 @@ export default {
     product: {
       type: Object,
       required: true,
+    },
+    department: {
+      type: String,
+      default: '',
     },
   },
 }

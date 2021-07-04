@@ -1,5 +1,5 @@
 <template>
-  <a-form-item :label="label">
+  <a-form-item :label="label" style="padding-bottom: 0; margin-bottom: 0">
     <a-input
       v-decorator="[
         decorator,

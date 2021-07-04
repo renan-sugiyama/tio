@@ -103,11 +103,11 @@ export default {
           label: 'TODO Novo',
           icon: 'plus',
         },
-        {
-          click: this.goToAddClient,
-          label: 'Novo 2',
-          icon: 'plus',
-        },
+        // {
+        //   click: this.goToAddClient,
+        //   label: 'Novo 2',
+        //   icon: 'plus',
+        // },
       ],
     }
   },

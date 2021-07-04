@@ -54,5 +54,9 @@ export default {
   .ant-modal-close {
     display: none !important;
   }
+
+  .ant-modal {
+    width: 100vw !important;
+  }
 }
 </style>

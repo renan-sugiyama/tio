@@ -15,7 +15,7 @@
             <strong>Nome:</strong> {{ order.contactName }}
           </td>
           <td rowspan="4" colspan="1" class="body-row-item text-center">
-            {{ order.deliveryDate }}
+            {{ deliveryDate }}
           </td>
         </tr>
         <tr class="body-row">
@@ -84,6 +84,8 @@
 </template>
 
 <script>
+import moment from 'moment'
+
 export default {
   name: 'OrderVisualization',
   props: {
@@ -91,6 +93,11 @@ export default {
       type: Object,
       required: true,
     },
+  },
+  data() {
+    return {
+      deliveryDate: moment(this.order.deliveryDate).format('DD/MMM/YY'),
+    }
   },
 }
 </script>
@@ -124,12 +131,6 @@ export default {
 
   &:last-child {
     margin-top: 20px;
-  }
-}
-
-@media print and (min-width: 480px) {
-  body {
-    background-color: lightgreen;
   }
 }
 </style>

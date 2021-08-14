@@ -171,7 +171,6 @@ export default {
       try {
         this.loading = true
         const data = await FirebaseService.getAllOnce(this.collection)
-        console.log(data)
         this.dataSource = data
         this.dataFiltered = data
       } catch (error) {

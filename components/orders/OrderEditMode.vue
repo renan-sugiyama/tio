@@ -1,6 +1,10 @@
 <template>
   <div>
-    <DrawerForm title="TODO pedidos" :visible="visible" @close="$emit('close')">
+    <DrawerForm
+      :title="data && data.id ? 'TODO Editar Pedido' : 'TODO Novo Pedido'"
+      :visible="visible"
+      @close="$emit('close')"
+    >
       <template slot="content">
         <a-form :form="form" layout="vertical" hide-required-mark>
           <a-steps
@@ -13,32 +17,16 @@
               <template slot="description">
                 <a-row v-show="currentStep === 0" :gutter="[8, 16]">
                   <a-col :span="24">
-                    <!-- TODO search client -->
-                    <AutoCompleteFormItem
+                    <TextFormItem
                       :initial-value="data.contactName"
-                      :data-source="clientOptions"
                       decorator="contactName"
-                      option-label-prop="value"
-                      label="TODO Order contactName"
-                      placeholder="TODO Order Name"
-                      message="TODO Please enter user contactName"
+                      label="TODO contactName name"
+                      placeholder="TODO contactName name"
                       required
-                      @select="onSelectUser"
-                      @change="searchUser"
-                    >
-                      <template slot="dataSource">
-                        <a-select-option
-                          v-for="client in clientOptions"
-                          :key="client.id"
-                          :value="client.name"
-                        >
-                          {{ client.name }}
-                        </a-select-option>
-                      </template>
-                    </AutoCompleteFormItem>
+                      message="TODO campo obrigatório"
+                    />
                   </a-col>
 
-                  <!-- TODO preencher automaticamente -->
                   <a-col :span="24">
                     <TextFormItem
                       :initial-value="data.deliverAddress"
@@ -50,7 +38,6 @@
                     />
                   </a-col>
 
-                  <!-- TODO preencher automaticamente -->
                   <a-col :span="24">
                     <TextFormItem
                       :initial-value="data.contactPhone"
@@ -62,7 +49,6 @@
                     />
                   </a-col>
 
-                  <!-- TODO preencher automaticamente -->
                   <a-col :span="24">
                     <TextFormItem
                       :initial-value="data.contactEmail"
@@ -76,6 +62,7 @@
                 </a-row>
               </template>
             </a-step>
+
             <a-step title="Produtos">
               <template slot="description">
                 <a-row v-show="currentStep === 1">
@@ -98,7 +85,6 @@
                       <a-col :span="22">
                         <a-row :gutter="[8, 12]">
                           <a-col :span="16">
-                            <!-- TODO colocar search -->
                             <SelectFormItem
                               :initial-value="product.name"
                               :options="productOptions"
@@ -123,6 +109,7 @@
                               label="TODO departamento"
                               placeholder="TODO departamento"
                               required
+                              disabled
                               message="TODO campo obrigatório"
                               @change="
                                 (value, options) =>
@@ -136,30 +123,6 @@
                           </a-col>
 
                           <template v-if="product.name">
-                            <a-col :span="8">
-                              <NumberFormItem
-                                :initial-value="product.price"
-                                :min="0"
-                                :precision="2"
-                                :formatter="
-                                  (value) => `${value} ${product.measurement}`
-                                "
-                                :parser="
-                                  (value) =>
-                                    value.replace(` ${product.measurement}`, '')
-                                "
-                                :decorator="`productPrice_${index}`"
-                                label="TODO price"
-                                placeholder="TODO productPrice"
-                                required
-                                message="TODO campo obrigatório"
-                                @change="
-                                  (value) =>
-                                    updateProduct(index, value, 'price')
-                                "
-                              />
-                            </a-col>
-
                             <a-col :span="8">
                               <NumberFormItem
                                 :initial-value="product.quantity"
@@ -178,16 +141,19 @@
                             </a-col>
 
                             <a-col :span="8">
-                              <div style="padding-bottom: 8px">TODO total</div>
-                              <div
-                                style="
-                                  height: 30px;
-                                  display: flex;
-                                  align-items: center;
+                              <SelectFormItem
+                                :initial-value="product.measurement"
+                                :options="measurementOptions"
+                                :decorator="`productMeasurement_${index}`"
+                                label="TODO measurement"
+                                placeholder="TODO measurement"
+                                required
+                                message="TODO campo obrigatório"
+                                @change="
+                                  (value) =>
+                                    updateProduct(index, value, 'measurement')
                                 "
-                              >
-                                $ {{ product.quantity * product.price || 0 }}
-                              </div>
+                              />
                             </a-col>
                           </template>
                         </a-row>
@@ -205,6 +171,7 @@
                 </a-row>
               </template>
             </a-step>
+
             <a-step title="Info">
               <template slot="description">
                 <a-row v-show="currentStep === 2" :gutter="[8, 16]">
@@ -218,6 +185,7 @@
                       message="TODO campo obrigatório"
                     />
                   </a-col>
+
                   <a-col :span="24">
                     <TextAreaFormItem
                       :initial-value="data.note"
@@ -250,9 +218,6 @@
             zIndex: 1,
           }"
         >
-          <span style="flex-grow: 1">
-            TODO Valor total: ${{ totalValue }}
-          </span>
           <a-button
             :style="{ marginRight: '8px' }"
             :disabled="loading"
@@ -274,7 +239,7 @@ import moment from 'moment'
 import FirebaseService from '~/service/firebase'
 import NumberFormItem from '~/components/common/form-item/NumberFormItem'
 import TextFormItem from '~/components/common/form-item/TextFormItem'
-import AutoCompleteFormItem from '~/components/common/form-item/AutoCompleteFormItem'
+// import AutoCompleteFormItem from '~/components/common/form-item/AutoCompleteFormItem'
 import SelectFormItem from '~/components/common/form-item/SelectFormItem'
 import DateFormItem from '~/components/common/form-item/DateFormItem'
 import TextAreaFormItem from '~/components/common/form-item/TextAreaFormItem'
@@ -285,7 +250,7 @@ export default {
   components: {
     NumberFormItem,
     TextFormItem,
-    AutoCompleteFormItem,
+    // AutoCompleteFormItem,
     SelectFormItem,
     DateFormItem,
     TextAreaFormItem,
@@ -300,6 +265,10 @@ export default {
       type: Object,
       default: () => ({}),
     },
+    measurementOptions: {
+      type: Array,
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -310,10 +279,9 @@ export default {
       clientOptions: [],
       departmentOptions: [],
       form: this.$form.createForm(this),
-      userSearchDebounceId: null,
-      clientNameSearch: '',
-      totalValue: this.data.totalValue || 0,
-      initialDeliveryDate: moment(this.data.deliveryDate),
+      initialDeliveryDate: this.data.deliveryDate
+        ? moment(new Date(this.data.deliveryDate))
+        : moment(),
     }
   },
 
@@ -329,9 +297,9 @@ export default {
       preserve: true,
     })
 
-    this.form.setFieldsValue({
-      products: this.data.products || [],
-    })
+    // this.form.setFieldsValue({
+    //   products: this.data.products || [],
+    // })
 
     await this.getDepartmentList()
     this.getProductList()
@@ -341,39 +309,9 @@ export default {
     updateNoteLength($event) {
       this.actualNoteLength = $event?.target?.value?.length
     },
+
     onStepChange(nextStep) {
       if (typeof nextStep === typeof 0) this.currentStep = nextStep
-    },
-
-    onSelectUser({ value, option }) {
-      const selectedClient = this.clientOptions.find(
-        (client) => client.id === option.key
-      )
-
-      this.form.setFieldsValue({
-        deliverAddress: selectedClient.address,
-      })
-
-      this.form.setFieldsValue({
-        contactPhone: selectedClient.phoneNumber,
-      })
-
-      this.form.setFieldsValue({
-        contactEmail: selectedClient.email,
-      })
-    },
-
-    searchUser(textValue) {
-      clearTimeout(this.userSearchDebounceId)
-
-      if (!textValue || textValue.length < 3) return
-      this.userSearchDebounceId = setTimeout(async () => {
-        this.clientOptions = await FirebaseService.getAllOnceStartWith(
-          'clients',
-          'name',
-          textValue
-        )
-      }, 800)
     },
 
     async getDepartmentList() {
@@ -382,7 +320,6 @@ export default {
         name: department.name,
         id: department.id,
       }))
-      console.log('this.departmentOptions', this.departmentOptions)
     },
 
     getProductDepartment(departmentId) {
@@ -397,8 +334,7 @@ export default {
       this.productOptions = productList.map((product) => ({
         id: product.id,
         name: product.name,
-        price: product.price,
-        measurement: product.measurement,
+        measurement: null,
         quantity: 1,
         department: this.getProductDepartment(product.departmentId),
       }))
@@ -411,16 +347,12 @@ export default {
       )
       products[index] = { ...product }
 
-      console.log('products', products)
-
       this.form.setFieldsValue({
         products,
         [`productQuantity_${index}`]: 1,
-        [`productPrice_${index}`]: product.price,
+        [`productMeasurement_${index}`]: null,
         [`productDepartment_${index}`]: product.department.name,
       })
-
-      this.totalValue = this.getTotalValue(products)
     },
 
     updateProduct(index, newValue, prop) {
@@ -430,14 +362,6 @@ export default {
         [prop]: newValue,
       }
       this.form.setFieldsValue({ products })
-
-      this.totalValue = this.getTotalValue(products)
-    },
-
-    getTotalValue(products) {
-      return products.reduce((acc, product) => {
-        return acc + product.quantity * product.price
-      }, 0)
     },
 
     updateProductDepartment(index, departmentId, prop) {
@@ -461,7 +385,6 @@ export default {
       const productsUpdated = products.concat({
         name: '',
         measurement: null,
-        price: 0,
         quantity: 0,
         department: null,
       })
@@ -479,8 +402,6 @@ export default {
       form.setFieldsValue({
         products,
       })
-
-      this.totalValue = this.getTotalValue(products)
     },
 
     async handleSubmit(e) {
@@ -496,7 +417,7 @@ export default {
           if (!this.data?.id) {
             orderNumber = await FirebaseService.incrementCounter('orders')
           }
-          await FirebaseService.createOrEditItem('orders', {
+          const result = await FirebaseService.createOrEditItem('orders', {
             id: this.data?.id,
             orderNumber: this.data.orderNumber || orderNumber,
             ...this.data,
@@ -505,13 +426,38 @@ export default {
             contactPhone: values.contactPhone,
             deliverAddress: values.deliverAddress,
             products: values.products,
-            deliveryDate: values.deliveryDate.format('YYYY-MM-DD'),
+            deliveryDate: values.deliveryDate.toDate().getTime(),
             note: values.note,
-            totalValue: this.totalValue,
           })
-          this.$emit('update')
+          if (this.data?.id) {
+            this.$emit('update', {
+              id: this.data?.id,
+              orderNumber: this.data.orderNumber || orderNumber,
+              ...this.data,
+              contactName: values.contactName,
+              contactEmail: values.contactEmail,
+              contactPhone: values.contactPhone,
+              deliverAddress: values.deliverAddress,
+              products: values.products,
+              deliveryDate: values.deliveryDate.toDate().getTime(),
+              note: values.note,
+            })
+          } else {
+            this.$emit('update', {
+              id: result?.id,
+              orderNumber,
+              contactName: values.contactName,
+              contactEmail: values.contactEmail,
+              contactPhone: values.contactPhone,
+              deliverAddress: values.deliverAddress,
+              products: values.products,
+              deliveryDate: values.deliveryDate.toDate().getTime(),
+              note: values.note,
+              createdAt: result?.createdAt,
+              updatedAt: result?.updatedAt,
+            })
+          }
         } catch (error) {
-          console.log(error)
           this.$message.error(
             `${
               this.data?.id

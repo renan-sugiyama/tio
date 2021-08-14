@@ -14,6 +14,11 @@
       :inline-collapsed="collapsed"
       @click="onNavigate"
     >
+      <a-menu-item key="registration-client-list">
+        <a-icon type="idcard" />
+        <span>TODO Clientes</span>
+      </a-menu-item>
+
       <a-menu-item key="registration-product-list">
         <a-icon type="tags" />
         <span>TODO Produtos</span>

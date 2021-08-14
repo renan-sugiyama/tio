@@ -53,14 +53,19 @@ class FirebaseService {
           updatedAt: Date.now(),
         })
     } else {
-      await db
-        .collection(collection)
-        .doc()
-        .set({
-          createdAt: Date.now(),
-          ...rest,
-          updatedAt: Date.now(),
-        })
+      const createdAt = Date.now()
+      const updatedAt = Date.now()
+      const result = await db.collection(collection).add({
+        createdAt,
+        ...rest,
+        updatedAt,
+      })
+
+      return {
+        id: result.id,
+        createdAt,
+        updatedAt,
+      }
     }
   }
 

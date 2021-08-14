@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div id="orderPrint">
     <table class="order-visualization-table">
       <thead class="head">
         <tr class="head-row">
@@ -94,12 +94,10 @@ export default {
       required: true,
     },
   },
-  computed: {
-    deliveryDate() {
-      return this.order?.deliveryDate
-        ? moment(this.order.deliveryDate).format('DD/MMM/YY')
-        : null
-    },
+  data() {
+    return {
+      deliveryDate: moment(this.order.deliveryDate).format('DD/MMM/YY'),
+    }
   },
 }
 </script>

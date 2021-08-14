@@ -1,158 +1,101 @@
 <template>
   <div class="list">
-    <OrderVisualizationModal ref="orderVisualizationModal" />
-    <OrdersVisualizationModal ref="ordersVisualizationModal" />
+    <div class="filters">
+      <a-row :gutter="16" class="selectors">
+        <!-- TODO -->
+        <!-- <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
+          <NumberInputFilter
+            v-model="filtersOptions.orderNumber"
+            :min="0"
+            title="TODO orderNumber"
+          />
+        </a-col> -->
 
-    <TheTable
+        <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
+          <TextInputFilter
+            v-model="filtersOptions.orderContactName"
+            title="TODO orderContactName"
+          />
+        </a-col>
+      </a-row>
+
+      <div class="actions">
+        <a-button
+          type="primary"
+          shape="circle"
+          icon="search"
+          @click="applyFilter"
+        />
+      </div>
+    </div>
+
+    <TheTableList
+      ref="tableList"
       collection="orders"
-      :columns="columns"
-      :filters-options="filtersOptions"
+      :filters="filters"
       :header-actions="headerActions"
-      :result-actions="resultActions"
-      :updated-element="updatedElement"
-      :has-department="true"
-      table-title="TODO Lista de produtos"
-    />
+      table-title="TODO Lista de pedidos"
+      @edit="showEditDrawer"
+    >
+      <template v-slot:item="{ item }">
+        <OrderCard :order="item" />
+      </template>
+    </TheTableList>
 
     <OrderEditMode
       v-if="isDrawerVisible"
       :data="editItem"
-      :measurement-options="measurementOptions"
       :visible="isDrawerVisible"
       @close="closeEditDrawer"
-      @update="updateElement"
+      @update="updateList"
     />
   </div>
 </template>
 
 <script>
-import FirebaseService from '~/service/firebase'
-import OrderVisualizationModal from '~/components/orders/OrderVisualizationModal.vue'
-import OrdersVisualizationModal from '~/components/orders/OrdersVisualizationModal.vue'
+import OrderCard from '~/components/orders/OrderCard'
 import OrderEditMode from '~/components/orders/OrderEditMode'
-import TheTable from '~/components/common/TheTable'
-import { filterOperators } from '~/enums/filterOperators'
-import { ordersDataMock } from '~/teste'
+import TheTableList from '~/components/common/TheTableList'
+import TextInputFilter from '~/components/common/filters/TextInputFilter'
+// import NumberInputFilter from '~/components/common/filters/NumberInputFilter'
 
 export default {
   components: {
-    TheTable,
+    OrderCard,
     OrderEditMode,
-    OrderVisualizationModal,
-    OrdersVisualizationModal,
+    TheTableList,
+    TextInputFilter,
+    // NumberInputFilter,
   },
 
   data() {
     return {
-      // TODO colocar na store?
-      dataToPrint: [],
-      measurementOptions: [],
       isDrawerVisible: false,
       editItem: {},
-      filtersOptions: [
-        {
-          value: '',
-          label: 'Client Name',
-          fieldName: 'contactName',
-          operator: filterOperators.INCLUDES,
-          type: 'string',
-        },
-      ],
-      updatedElement: {},
-      columns: [
-        {
-          title: 'Order Number',
-          dataIndex: 'orderNumber',
-          fixed: 'left',
-          sorter: true,
-        },
-        {
-          title: 'Client Name',
-          dataIndex: 'contactName',
-          fixed: 'left',
-          sorter: true,
-        },
-        {
-          title: 'Phone',
-          dataIndex: 'contactPhone',
-          sorter: true,
-        },
-        {
-          title: 'Delivery Date',
-          dataIndex: 'deliveryDate',
-          scopedSlots: { customRender: 'deliveryDate' },
-        },
-        {
-          title: 'Deliver Address',
-          dataIndex: 'deliverAddress',
-        },
-        {
-          title: 'Created At',
-          dataIndex: 'createdAt',
-          type: 'date',
-          scopedSlots: { customRender: 'createdAt' },
-        },
-        {
-          title: 'Updated At',
-          dataIndex: 'updatedAt',
-          scopedSlots: { customRender: 'updatedAt' },
-        },
-        {
-          title: 'Action',
-          key: 'action',
-          width: 200,
-          scopedSlots: { customRender: 'action' },
-        },
-      ],
+      filters: [],
+      filtersOptions: {
+        orderNumber: 0,
+        orderContactName: '',
+      },
       headerActions: [
         {
           click: this.showEditDrawer,
-          label: 'New',
+          label: 'TODO Novo',
           icon: 'plus',
-        },
-        {
-          click: this.printAll,
-          label: 'Print',
-          icon: 'printer',
-        },
-      ],
-      resultActions: [
-        {
-          click: this.showEditDrawer,
-          label: 'Edit',
-        },
-        {
-          click: this.openOrderVisualizationModal,
-          label: 'Print',
         },
       ],
     }
   },
 
-  async mounted() {
-    await this.getMeasurementList()
-  },
-
   methods: {
-    // TODO colocar getMeasurementList na store e popular no momento que carregar a aplicacao
-    async getMeasurementList() {
-      const measurementList = await FirebaseService.getAllOnce(
-        'productsMeasurements'
-      )
-      this.measurementOptions = measurementList.map((measurement) => ({
-        name: measurement.name,
-        value: measurement.id,
-      }))
-    },
-
     showEditDrawer(item) {
       this.editItem = item
       this.isDrawerVisible = true
     },
 
-    updateElement(item) {
-      this.updatedElement = item
+    updateList() {
       this.closeEditDrawer()
+      this.$refs.tableList.refresh()
     },
 
     closeEditDrawer() {
@@ -160,23 +103,40 @@ export default {
       this.isDrawerVisible = false
     },
 
-    openOrderVisualizationModal(order) {
-      this.$refs.orderVisualizationModal.open(order)
-    },
-
-    printAll() {
-      try {
-        this.loading = true
-        // this.dataToPrint = await FirebaseService.getAllOnce('orders')
-        this.$refs.ordersVisualizationModal.open(ordersDataMock)
-        console.log('print all')
-      } catch (error) {
-        // TODO
-        console.log('rro', error)
-      } finally {
-        this.loading = false
+    applyFilter() {
+      const newFilters = []
+      if (this.filtersOptions.orderNumber) {
+        newFilters.push({
+          prop: 'number',
+          operator: '==',
+          value: this.filtersOptions.orderNumber,
+        })
       }
+      if (this.filtersOptions.orderContactName) {
+        newFilters.push({
+          prop: 'contactName',
+          operator: '==',
+          value: this.filtersOptions.orderContactName,
+        })
+      }
+      this.filters = newFilters
     },
   },
 }
 </script>
+
+<style lang="less" scoped>
+.list {
+  .filters {
+    display: flex;
+    align-items: center;
+    padding-bottom: 10px;
+    margin: 10px 0 20px;
+    border-bottom: 1px solid @border-color-base;
+
+    .selectors {
+      flex-grow: 1;
+    }
+  }
+}
+</style>

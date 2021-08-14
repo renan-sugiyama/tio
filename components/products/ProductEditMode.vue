@@ -2,7 +2,7 @@
   <div>
     <DrawerForm
       :handle-submit="handleSubmit"
-      :title="data && data.id ? 'TODO Editar Produto' : 'TODO Novo Produto'"
+      title="TODO usuarios"
       :visible="visible"
       @close="$emit('close')"
     >
@@ -32,8 +32,7 @@
               />
             </a-col>
 
-            <!-- TODO CLEAN -->
-            <!-- <a-col :span="8">
+            <a-col :span="8">
               <NumberFormItem
                 :initial-value="data.price"
                 :min="0"
@@ -44,10 +43,9 @@
                 required
                 message="TODO campo obrigatório"
               />
-            </a-col> -->
+            </a-col>
 
-            <!-- TODO CLEAN -->
-            <!-- <a-col :span="16">
+            <a-col :span="16">
               <SelectFormItem
                 :initial-value="data.measurement"
                 :options="measurementOptions"
@@ -57,7 +55,7 @@
                 required
                 message="TODO campo obrigatório"
               />
-            </a-col> -->
+            </a-col>
           </a-row>
         </a-form>
       </template>
@@ -68,8 +66,7 @@
 <script>
 import FirebaseService from '~/service/firebase'
 import TextFormItem from '~/components/common/form-item/TextFormItem'
-// <!-- TODO CLEAN -->
-// import NumberFormItem from '~/components/common/form-item/NumberFormItem'
+import NumberFormItem from '~/components/common/form-item/NumberFormItem'
 import SelectFormItem from '~/components/common/form-item/SelectFormItem'
 import DrawerForm from '~/components/common/DrawerForm'
 
@@ -79,8 +76,7 @@ export default {
     DrawerForm,
     SelectFormItem,
     TextFormItem,
-    // <!-- TODO CLEAN -->
-    // NumberFormItem,
+    NumberFormItem,
   },
   props: {
     visible: {
@@ -98,17 +94,31 @@ export default {
   },
   data() {
     return {
+      measurementOptions: [],
       form: this.$form.createForm(this),
     }
   },
-
   watch: {
     data() {
       this.form = this.$form.createForm(this)
     },
   },
 
+  mounted() {
+    this.getMeasurementList()
+  },
+
   methods: {
+    async getMeasurementList() {
+      const measurementList = await FirebaseService.getAllOnce(
+        'productsMeasurements'
+      )
+      this.measurementOptions = measurementList.map((measurement) => ({
+        name: measurement.name,
+        value: measurement.id,
+      }))
+    },
+
     async handleSubmit(e) {
       e.preventDefault()
       await this.form.validateFields(async (err, values) => {
@@ -117,28 +127,12 @@ export default {
           return
         }
         // TODO add LOADING
-        if (this.data?.id) {
-          await FirebaseService.createOrEditItem('products', {
-            id: this.data?.id,
-            ...this.data,
-            ...values,
-          })
-          this.$emit('update', {
-            id: this.data?.id,
-            ...this.data,
-            ...values,
-          })
-        } else {
-          const result = await FirebaseService.createOrEditItem('products', {
-            ...values,
-          })
-          this.$emit('update', {
-            id: result?.id,
-            createdAt: result?.createdAt,
-            updatedAt: result?.updatedAt,
-            ...values,
-          })
-        }
+        await FirebaseService.createOrEditItem('products', {
+          id: this.data?.id,
+          ...this.data,
+          ...values,
+        })
+        this.$emit('update')
       })
     },
   },

@@ -1,40 +1,15 @@
 <template>
-  <div class="list">
-    <div class="filters">
-      <a-row :gutter="16" class="selectors">
-        <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
-          <TextInputFilter
-            v-model="filtersOptions.productName"
-            title="TODO name"
-          />
-        </a-col>
-      </a-row>
-
-      <div class="actions">
-        <a-button
-          type="primary"
-          shape="circle"
-          icon="search"
-          @click="applyFilter"
-        />
-      </div>
-    </div>
-
-    <TheTableList
-      ref="tableList"
+  <div class="product-table-list">
+    <TheTable
       collection="products"
-      :filters="filters"
+      :columns="columns"
+      :filters-options="filtersOptions"
       :header-actions="headerActions"
+      :result-actions="resultActions"
+      :updated-element="updatedElement"
+      :has-department="true"
       table-title="TODO Lista de produtos"
-      @edit="showEditDrawer"
-    >
-      <template v-slot:item="{ item }">
-        <ProductCard
-          :product="item"
-          :department="getProductDepartmentName(item)"
-        />
-      </template>
-    </TheTableList>
+    />
 
     <ProductEditMode
       v-if="isDrawerVisible"
@@ -42,24 +17,21 @@
       :departments="departments"
       :visible="isDrawerVisible"
       @close="closeEditDrawer"
-      @update="updateList"
+      @update="updateElement"
     />
   </div>
 </template>
 
 <script>
-import ProductCard from '~/components/products/ProductCard'
-import ProductEditMode from '~/components/products/ProductEditMode'
-import TheTableList from '~/components/common/TheTableList'
-import TextInputFilter from '~/components/common/filters/TextInputFilter'
 import FirebaseService from '~/service/firebase'
+import ProductEditMode from '~/components/products/ProductEditMode'
+import TheTable from '~/components/common/TheTable'
+import { filterOperators } from '~/enums/filterOperators'
 
 export default {
   components: {
-    ProductCard,
+    TheTable,
     ProductEditMode,
-    TheTableList,
-    TextInputFilter,
   },
 
   data() {
@@ -67,21 +39,51 @@ export default {
       departments: [],
       isDrawerVisible: false,
       editItem: {},
-      filters: [],
-      filtersOptions: {
-        productName: '',
-      },
+      filtersOptions: [
+        {
+          value: '',
+          label: 'Name',
+          fieldName: 'name',
+          operator: filterOperators.INCLUDES,
+          type: 'string',
+        },
+      ],
+      updatedElement: {},
+      columns: [
+        {
+          title: 'Name',
+          dataIndex: 'name',
+          sorter: true,
+        },
+        {
+          title: 'Departamento',
+          dataIndex: 'departmentId',
+          sorter: true,
+          scopedSlots: { customRender: 'departmentId' },
+        },
+        {
+          title: 'Action',
+          key: 'action',
+          scopedSlots: { customRender: 'action' },
+        },
+      ],
       headerActions: [
         {
           click: this.showEditDrawer,
           label: 'TODO Novo',
-          icon: 'plus',
+        },
+      ],
+      resultActions: [
+        {
+          click: this.showEditDrawer,
+          label: 'TODO Editar',
         },
       ],
     }
   },
 
   async mounted() {
+    // TODO colocar getDepartmentsList na store e popular no momento que carregar a aplicacao
     await this.getDepartmentsList()
   },
 
@@ -90,56 +92,20 @@ export default {
       this.departments = await FirebaseService.getAllOnce('departments')
     },
 
-    getProductDepartmentName(departmentId) {
-      return (
-        this.departments.find(
-          (department) => department.id === departmentId.departmentId
-        )?.name || ''
-      )
-    },
-
     showEditDrawer(item) {
       this.editItem = item
       this.isDrawerVisible = true
     },
 
-    updateList() {
+    updateElement(item) {
+      this.updatedElement = item
       this.closeEditDrawer()
-      this.$refs.tableList.refresh()
     },
 
     closeEditDrawer() {
       this.editItem = {}
       this.isDrawerVisible = false
     },
-
-    applyFilter() {
-      const newFilters = []
-      if (this.filtersOptions.productName) {
-        newFilters.push({
-          prop: 'name',
-          operator: '==',
-          value: this.filtersOptions.productName,
-        })
-      }
-      this.filters = newFilters
-    },
   },
 }
 </script>
-
-<style lang="less" scoped>
-.list {
-  .filters {
-    display: flex;
-    align-items: center;
-    padding-bottom: 10px;
-    margin: 10px 0 20px;
-    border-bottom: 1px solid @border-color-base;
-
-    .selectors {
-      flex-grow: 1;
-    }
-  }
-}
-</style>

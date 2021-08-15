@@ -7,6 +7,7 @@
       v-model="currentValue"
       :placeholder="placeholder"
       class="input-field"
+      @keyup.enter="onKeyEnter"
       @change="$emit('input', currentValue)"
     />
   </div>
@@ -27,6 +28,10 @@ export default {
     placeholder: {
       type: String,
       default: '',
+    },
+    onKeyEnter: {
+      type: Function,
+      default: () => ({}),
     },
   },
 

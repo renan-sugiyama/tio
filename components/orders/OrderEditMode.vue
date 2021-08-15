@@ -1,8 +1,9 @@
 <template>
   <div>
     <DrawerForm
-      :title="data && data.id ? 'TODO Editar Pedido' : 'TODO Novo Pedido'"
+      :title="data && data.id ? 'Edit order' : 'Create a order'"
       :visible="visible"
+      width="100vw"
       @close="$emit('close')"
     >
       <template slot="content">
@@ -13,28 +14,17 @@
             size="small"
             @change="onStepChange"
           >
-            <a-step title="TODO Dados do Cliente">
+            <a-step title="Client Info">
               <template slot="description">
                 <a-row v-show="currentStep === 0" :gutter="[8, 16]">
                   <a-col :span="24">
                     <TextFormItem
                       :initial-value="data.contactName"
                       decorator="contactName"
-                      label="TODO contactName name"
-                      placeholder="TODO contactName name"
+                      label="Client Name"
+                      placeholder=""
                       required
-                      message="TODO campo obrigatório"
-                    />
-                  </a-col>
-
-                  <a-col :span="24">
-                    <TextFormItem
-                      :initial-value="data.deliverAddress"
-                      decorator="deliverAddress"
-                      label="TODO Order deliverAddress"
-                      placeholder="TODO Order deliverAddress"
-                      required
-                      message="TODO Please enter user deliverAddress"
+                      message="This field is required"
                     />
                   </a-col>
 
@@ -42,10 +32,10 @@
                     <TextFormItem
                       :initial-value="data.contactPhone"
                       decorator="contactPhone"
-                      label="TODO Order contactPhone"
-                      placeholder="TODO Order contactPhone"
+                      label="Phone number"
+                      placeholder=""
                       required
-                      message="TODO Please enter user contactPhone"
+                      message="This field is required"
                     />
                   </a-col>
 
@@ -53,10 +43,9 @@
                     <TextFormItem
                       :initial-value="data.contactEmail"
                       decorator="contactEmail"
-                      label="TODO Order contactEmail"
-                      placeholder="TODO Order contactEmail"
+                      label="E-mail"
+                      placeholder=""
                       :required="false"
-                      message="TODO Please enter user contactEmail"
                     />
                   </a-col>
                 </a-row>
@@ -67,7 +56,9 @@
               <template slot="description">
                 <a-row v-show="currentStep === 1">
                   <a-col :span="24">
-                    <button @click="addProduct">TODO + produto</button>
+                    <a-button type="primary" @click="addProduct">
+                      Add product
+                    </a-button>
                   </a-col>
 
                   <a-col :span="24">
@@ -89,10 +80,10 @@
                               :initial-value="product.name"
                               :options="productOptions"
                               :decorator="`productName_${index}`"
-                              label="TODO product name"
-                              placeholder="TODO product name"
+                              label="Product name"
+                              placeholder=""
                               required
-                              message="TODO campo obrigatório"
+                              message="This field is required"
                               @change="
                                 (value) => updateSelectedProduct(index, value)
                               "
@@ -106,11 +97,11 @@
                               "
                               :options="departmentOptions"
                               :decorator="`productDepartment_${index}`"
-                              label="TODO departamento"
-                              placeholder="TODO departamento"
+                              label="Department"
+                              placeholder=""
                               required
                               disabled
-                              message="TODO campo obrigatório"
+                              message="This field is required"
                               @change="
                                 (value, options) =>
                                   updateProductDepartment(
@@ -129,10 +120,10 @@
                                 :min="0"
                                 :precision="2"
                                 :decorator="`productQuantity_${index}`"
-                                label="TODO quantity"
-                                placeholder="TODO quantity"
+                                label="Quantity"
+                                placeholder=""
                                 required
-                                message="TODO campo obrigatório"
+                                message="This field is required"
                                 @change="
                                   (value) =>
                                     updateProduct(index, value, 'quantity')
@@ -143,12 +134,12 @@
                             <a-col :span="8">
                               <SelectFormItem
                                 :initial-value="product.measurement"
-                                :options="measurementOptions"
+                                :options="measurements"
                                 :decorator="`productMeasurement_${index}`"
-                                label="TODO measurement"
-                                placeholder="TODO measurement"
+                                label="Measurement"
+                                placeholder=""
                                 required
-                                message="TODO campo obrigatório"
+                                message="This field is required"
                                 @change="
                                   (value) =>
                                     updateProduct(index, value, 'measurement')
@@ -172,17 +163,28 @@
               </template>
             </a-step>
 
-            <a-step title="Info">
+            <a-step title="Additional Info">
               <template slot="description">
                 <a-row v-show="currentStep === 2" :gutter="[8, 16]">
-                  <a-col :span="24">
+                  <a-col :span="12">
                     <DateFormItem
                       :initial-value="initialDeliveryDate"
                       decorator="deliveryDate"
-                      label="TODO delivery date"
-                      placeholder="TODO delivery date"
+                      label="Delivery date"
+                      placeholder=""
                       required
-                      message="TODO campo obrigatório"
+                      message="This field is required"
+                    />
+                  </a-col>
+
+                  <a-col :span="12">
+                    <SelectFormItem
+                      :initial-value="data.deliveryPeriod"
+                      :options="deliveryPeriods"
+                      decorator="deliveryPeriod"
+                      label="Delivery Period"
+                      placeholder=""
+                      :required="false"
                     />
                   </a-col>
 
@@ -190,8 +192,8 @@
                     <TextAreaFormItem
                       :initial-value="data.note"
                       decorator="note"
-                      :label="`TODO observação (${actualNoteLength} / 100)`"
-                      placeholder="TODO observação"
+                      :label="`Note (${actualNoteLength} / 100)`"
+                      placeholder=""
                       :autosize="{ minRows: 3 }"
                       @change="updateNoteLength"
                     />
@@ -226,7 +228,7 @@
             Cancel
           </a-button>
           <a-button type="primary" :loading="loading" @click="handleSubmit">
-            Submit
+            {{ data && data.id ? 'Edit' : 'Create' }}
           </a-button>
         </div>
       </template>
@@ -235,11 +237,11 @@
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import moment from 'moment'
 import FirebaseService from '~/service/firebase'
 import NumberFormItem from '~/components/common/form-item/NumberFormItem'
 import TextFormItem from '~/components/common/form-item/TextFormItem'
-// import AutoCompleteFormItem from '~/components/common/form-item/AutoCompleteFormItem'
 import SelectFormItem from '~/components/common/form-item/SelectFormItem'
 import DateFormItem from '~/components/common/form-item/DateFormItem'
 import TextAreaFormItem from '~/components/common/form-item/TextAreaFormItem'
@@ -250,7 +252,6 @@ export default {
   components: {
     NumberFormItem,
     TextFormItem,
-    // AutoCompleteFormItem,
     SelectFormItem,
     DateFormItem,
     TextAreaFormItem,
@@ -265,10 +266,6 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    measurementOptions: {
-      type: Array,
-      default: () => [],
-    },
   },
   data() {
     return {
@@ -280,9 +277,16 @@ export default {
       departmentOptions: [],
       form: this.$form.createForm(this),
       initialDeliveryDate: this.data.deliveryDate
-        ? moment(new Date(this.data.deliveryDate))
+        ? moment(this.data.deliveryDate)
         : moment(),
     }
+  },
+
+  computed: {
+    ...mapGetters({
+      measurements: 'globalValues/getMeasurements',
+      deliveryPeriods: 'globalValues/getDeliveryPeriods',
+    }),
   },
 
   watch: {
@@ -407,8 +411,13 @@ export default {
     async handleSubmit(e) {
       e.preventDefault()
       await this.form.validateFields(async (err, values) => {
+        if (!(values.products && values.products.length)) {
+          this.$message.error('Selecione ao menos um produto')
+          return
+        }
+
         if (err) {
-          this.$message.error('TODO verifique os campos obrigatórios')
+          this.$message.error('Please, fill all required fields')
           return
         }
         try {
@@ -421,12 +430,13 @@ export default {
             id: this.data?.id,
             orderNumber: this.data.orderNumber || orderNumber,
             ...this.data,
+            contactNameToFilter: values.contactName.toLowerCase(),
             contactName: values.contactName,
             contactEmail: values.contactEmail,
             contactPhone: values.contactPhone,
-            deliverAddress: values.deliverAddress,
             products: values.products,
-            deliveryDate: values.deliveryDate.toDate().getTime(),
+            deliveryDate: values.deliveryDate.format('YYYY-MM-DD'),
+            deliveryPeriod: values.deliveryPeriod,
             note: values.note,
           })
           if (this.data?.id) {
@@ -437,9 +447,9 @@ export default {
               contactName: values.contactName,
               contactEmail: values.contactEmail,
               contactPhone: values.contactPhone,
-              deliverAddress: values.deliverAddress,
               products: values.products,
-              deliveryDate: values.deliveryDate.toDate().getTime(),
+              deliveryDate: values.deliveryDate.format('YYYY-MM-DD'),
+              deliveryPeriod: values.deliveryPeriod,
               note: values.note,
             })
           } else {
@@ -449,9 +459,9 @@ export default {
               contactName: values.contactName,
               contactEmail: values.contactEmail,
               contactPhone: values.contactPhone,
-              deliverAddress: values.deliverAddress,
               products: values.products,
-              deliveryDate: values.deliveryDate.toDate().getTime(),
+              deliveryDate: values.deliveryDate.format('YYYY-MM-DD'),
+              deliveryPeriod: values.deliveryPeriod,
               note: values.note,
               createdAt: result?.createdAt,
               updatedAt: result?.updatedAt,
@@ -461,8 +471,8 @@ export default {
           this.$message.error(
             `${
               this.data?.id
-                ? 'TODO Não foi possível atualizar o pedido'
-                : 'TODO Não foi possível criar o pedido'
+                ? 'It was not possible to edit the order'
+                : 'It was not possible to create the order'
             }`
           )
         } finally {

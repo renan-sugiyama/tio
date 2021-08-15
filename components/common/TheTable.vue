@@ -1,16 +1,39 @@
 <template>
   <div class="the-table">
     <div class="filters">
-      <a-row :gutter="16" class="selectors">
-        <a-col :xs="{ span: 8 }" :md="{ span: 6 }" :lg="{ span: 4 }">
-          <template v-for="filter in filtersOptions">
-            <TextInputFilter
-              :key="filter.fieldName"
+      <a-row :gutter="[16, 16]" class="selectors">
+        <form @submit.prevent="applyFilter">
+          <a-col
+            v-for="filter in filtersOptions"
+            :key="filter.fieldName"
+            :xs="{ span: 24 }"
+            :md="{ span: 12 }"
+            :lg="{ span: 8 }"
+            :xl="{ span: 6 }"
+          >
+            <NumberInputFilter
+              v-if="filter.type === 'number'"
               v-model="filter.value"
               :title="filter.label"
+              :on-key-enter="applyFilter"
             />
-          </template>
-        </a-col>
+
+            <TextInputFilter
+              v-if="filter.type === 'string'"
+              v-model="filter.value"
+              :title="filter.label"
+              :on-key-enter="applyFilter"
+            />
+
+            <DateInputFilter
+              v-if="filter.type === 'date'"
+              v-model="filter.value"
+              :allow-clear="filter.allowClear"
+              :title="filter.label"
+              @input="applyFilter"
+            />
+          </a-col>
+        </form>
       </a-row>
 
       <div class="actions">
@@ -23,7 +46,13 @@
       </div>
     </div>
 
-    <div class="header-actions">
+    <!-- TODO trocar nome da classe e do CreateButton component -->
+    <div class="table-header">
+      <div>
+        <h5 class="table-header__title">
+          {{ tableTitle }}
+        </h5>
+      </div>
       <CreateButton :header-actions="headerActions" />
     </div>
 
@@ -33,30 +62,22 @@
       :data-source="dataFiltered"
       :loading="loading"
       :pagination="false"
-      :scroll="{ x: 1300 }"
+      :scroll="{ x: 1100 }"
       class="table-component"
     >
-      <template v-if="hasDepartment" slot="createdAt" slot-scope="createdAt">
+      <template slot="createdAt" slot-scope="createdAt">
         {{ createdAt ? formatDateField(createdAt) : '' }}
       </template>
 
-      <template v-if="hasDepartment" slot="updatedAt" slot-scope="updatedAt">
+      <template slot="updatedAt" slot-scope="updatedAt">
         {{ updatedAt ? formatDateField(updatedAt) : '' }}
       </template>
 
-      <template
-        v-if="hasDepartment"
-        slot="deliveryDate"
-        slot-scope="deliveryDate"
-      >
-        {{ deliveryDate ? formatDateField(deliveryDate) : '' }}
+      <template slot="deliveryDate" slot-scope="deliveryDate">
+        {{ deliveryDate ? formatDateFieldMoment(deliveryDate) : '' }}
       </template>
 
-      <template
-        v-if="hasDepartment"
-        slot="departmentId"
-        slot-scope="departmentId"
-      >
+      <template slot="departmentId" slot-scope="departmentId">
         {{ departmentId ? getProductDepartmentName(departmentId) : '' }}
       </template>
 
@@ -72,28 +93,35 @@
           <a-divider :key="`${action.label}_delete`" type="vertical" />
         </template>
 
-        <span
-          class="table-action table-action--delete"
-          @click="() => deleteItemById(record.id)"
+        <a-popconfirm
+          title="Are you sure?"
+          ok-text="Yes"
+          cancel-text="No"
+          @confirm="deleteItemById(record.id)"
         >
-          Deletar
-        </span>
+          <span class="table-action table-action--delete"> Delete </span>
+        </a-popconfirm>
       </template>
     </a-table>
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import moment from 'moment'
 import FirebaseService from '~/service/firebase'
-import TableFilterService from '~/service/TableFilterService'
+import NumberInputFilter from '~/components/common/filters/NumberInputFilter'
 import TextInputFilter from '~/components/common/filters/TextInputFilter'
+import DateInputFilter from '~/components/common/filters/DateInputFilter'
 import CreateButton from '~/components/common/CreateButton'
+import { filterOperators } from '~/enums/filterOperators'
 
 export default {
   name: 'TheTable',
   components: {
+    NumberInputFilter,
     TextInputFilter,
+    DateInputFilter,
     CreateButton,
   },
 
@@ -122,9 +150,9 @@ export default {
       type: Array,
       default: () => [],
     },
-    hasDepartment: {
-      type: Boolean,
-      default: false,
+    tableTitle: {
+      type: String,
+      default: '',
     },
   },
 
@@ -133,9 +161,13 @@ export default {
       dataSource: [],
       loading: false,
       dataFiltered: [],
-      tableFilterService: null,
-      departments: [],
     }
+  },
+
+  computed: {
+    ...mapGetters({
+      departments: 'globalValues/getDepartments',
+    }),
   },
 
   watch: {
@@ -144,11 +176,8 @@ export default {
     },
   },
 
-  async mounted() {
-    if (this.hasDepartment) {
-      await this.getDepartmentsList()
-    }
-    this.getData()
+  mounted() {
+    this.getData(this.filtersOptions)
   },
 
   methods: {
@@ -156,8 +185,8 @@ export default {
       return moment(new Date(dateTimestamp)).format('DD/MMM/YYYY')
     },
 
-    async getDepartmentsList() {
-      this.departments = await FirebaseService.getAllOnce('departments')
+    formatDateFieldMoment(dateString) {
+      return moment(dateString).format('DD/MMM/YYYY')
     },
 
     getProductDepartmentName(departmentId) {
@@ -167,14 +196,57 @@ export default {
       )
     },
 
-    async getData() {
+    getFiltersMapped(filtersOptions) {
+      const filters = filtersOptions.filter(
+        (filterOption) => filterOption.value
+      )
+      const filtersMapped = []
+
+      filters.forEach((filter) => {
+        if (filter.operator === filterOperators.EQUALS) {
+          filtersMapped.push({
+            prop: filter.fieldName,
+            operator: '==',
+            value:
+              filter.type === 'date'
+                ? filter.value.format('YYYY-MM-DD')
+                : filter.value,
+          })
+        } else if (filter.operator === filterOperators.INCLUDES) {
+          filtersMapped.push({
+            prop: filter.fieldName,
+            operator: '>=',
+            value:
+              filter.type === 'date'
+                ? filter.value.format('YYYY-MM-DD')
+                : filter.value.toLowerCase(),
+          })
+          filtersMapped.push({
+            prop: filter.fieldName,
+            operator: '<=',
+            value:
+              filter.type === 'date'
+                ? filter.value.format('YYYY-MM-DD')
+                : filter.value.toLowerCase() + '\uF8FF',
+          })
+        }
+      })
+
+      return filtersMapped
+    },
+
+    async getData(filtersOptions) {
+      const filters = this.getFiltersMapped(filtersOptions)
       try {
         this.loading = true
-        const data = await FirebaseService.getAllOnce(this.collection)
+        const data = await FirebaseService.getListFiltered(
+          this.collection,
+          filters
+        )
         this.dataSource = data
         this.dataFiltered = data
       } catch (error) {
-        // TODO
+        this.$message.error('Error trying to get the data')
       } finally {
         this.loading = false
       }
@@ -206,17 +278,15 @@ export default {
         await FirebaseService.deleteItemById(this.collection, { id })
         this.removeElementListSync(id)
       } catch (error) {
-        // TODO
+        this.$message.error('It was not possible to delete the item')
       } finally {
         this.loading = false
       }
     },
 
-    applyFilter() {
-      this.dataFiltered = TableFilterService.filterData(
-        this.dataSource,
-        this.filtersOptions
-      )
+    async applyFilter() {
+      await this.getData(this.filtersOptions)
+      this.$emit('filtersApplied', this.filtersOptions)
     },
   },
 }
@@ -237,18 +307,31 @@ export default {
     .selectors {
       flex-grow: 1;
     }
+    .actions {
+      margin-left: 8px;
+    }
   }
 
-  .header-actions {
+  .table-header {
     width: 100%;
     display: flex;
-    justify-content: flex-end;
-    margin-bottom: 5px;
+    justify-content: space-between;
+    margin-bottom: 15px;
+
+    &__title {
+      font-size: 18px;
+      font-weight: 600;
+      color: @primary-color;
+    }
   }
 
   .table-action {
     cursor: pointer;
     color: @link-color;
+
+    &--delete {
+      color: @error-color;
+    }
   }
 }
 </style>

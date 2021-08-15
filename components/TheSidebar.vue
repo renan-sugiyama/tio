@@ -5,8 +5,6 @@
     collapsible
     class="the-sidebar"
   >
-    <div class="logo" />
-    <!-- TODO default-selected-keys based on url-->
     <a-menu
       :default-selected-keys="[activeRoute]"
       mode="inline"
@@ -16,12 +14,12 @@
     >
       <a-menu-item key="registration-product-list">
         <a-icon type="tags" />
-        <span>TODO Produtos</span>
+        <span>Products</span>
       </a-menu-item>
 
       <a-menu-item key="registration-order-list">
         <a-icon type="profile" />
-        <span>TODO Pedidos</span>
+        <span>Orders</span>
       </a-menu-item>
 
       <!-- <a-sub-menu key="sub1">
@@ -71,12 +69,6 @@ export default {
 
 <style lang="less" scoped>
 .the-sidebar {
-  .logo {
-    height: 32px;
-    background: rgba(255, 255, 255, 0.2);
-    margin: 16px;
-  }
-
   .sidebar-item {
     color: @sidebar-font-color;
   }

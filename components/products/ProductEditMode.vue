@@ -1,86 +1,52 @@
 <template>
-  <div>
-    <DrawerForm
-      :handle-submit="handleSubmit"
-      :title="data && data.id ? 'TODO Editar Produto' : 'TODO Novo Produto'"
-      :visible="visible"
-      @close="$emit('close')"
-    >
-      <template slot="content">
-        <a-form :form="form" layout="vertical" hide-required-mark>
-          <a-row :gutter="[8, 16]">
-            <a-col :span="16">
-              <TextFormItem
-                :initial-value="data.name"
-                decorator="name"
-                label="TODO Product name"
-                placeholder="TODO Product name"
-                required
-                message="TODO campo obrigatório"
-              />
-            </a-col>
+  <a-modal
+    :title="data && data.id ? 'Product edit' : 'Create a product'"
+    :visible="visible"
+    :ok-text="data && data.id ? 'Edit' : 'Create'"
+    @close="$emit('close')"
+    @ok="handleSubmit"
+    @cancel="$emit('close')"
+  >
+    <a-form :form="form" layout="vertical" hide-required-mark>
+      <a-row :gutter="[8, 16]">
+        <a-col :span="16">
+          <TextFormItem
+            :initial-value="data.name"
+            decorator="name"
+            label="Product name"
+            placeholder=""
+            required
+            message="This field is required"
+          />
+        </a-col>
 
-            <a-col :span="8">
-              <SelectFormItem
-                :initial-value="data.departmentId"
-                :options="departments"
-                :decorator="`departmentId`"
-                label="TODO departamento"
-                placeholder="TODO departamento"
-                required
-                message="TODO campo obrigatório"
-              />
-            </a-col>
-
-            <!-- TODO CLEAN -->
-            <!-- <a-col :span="8">
-              <NumberFormItem
-                :initial-value="data.price"
-                :min="0"
-                :precision="2"
-                decorator="price"
-                label="TODO productPrice"
-                placeholder="TODO productPrice"
-                required
-                message="TODO campo obrigatório"
-              />
-            </a-col> -->
-
-            <!-- TODO CLEAN -->
-            <!-- <a-col :span="16">
-              <SelectFormItem
-                :initial-value="data.measurement"
-                :options="measurementOptions"
-                decorator="measurement"
-                label="TODO measurement"
-                placeholder="TODO measurement"
-                required
-                message="TODO campo obrigatório"
-              />
-            </a-col> -->
-          </a-row>
-        </a-form>
-      </template>
-    </DrawerForm>
-  </div>
+        <a-col :span="8">
+          <SelectFormItem
+            :initial-value="data.departmentId"
+            :options="departments"
+            :decorator="`departmentId`"
+            label="Department"
+            placeholder=""
+            required
+            message="This field is required"
+          />
+        </a-col>
+      </a-row>
+    </a-form>
+  </a-modal>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import FirebaseService from '~/service/firebase'
 import TextFormItem from '~/components/common/form-item/TextFormItem'
-// <!-- TODO CLEAN -->
-// import NumberFormItem from '~/components/common/form-item/NumberFormItem'
 import SelectFormItem from '~/components/common/form-item/SelectFormItem'
-import DrawerForm from '~/components/common/DrawerForm'
 
 export default {
   name: 'ProductEditMode',
   components: {
-    DrawerForm,
     SelectFormItem,
     TextFormItem,
-    // <!-- TODO CLEAN -->
-    // NumberFormItem,
   },
   props: {
     visible: {
@@ -91,15 +57,18 @@ export default {
       type: Object,
       default: () => ({}),
     },
-    departments: {
-      type: Array,
-      required: true,
-    },
   },
+
   data() {
     return {
       form: this.$form.createForm(this),
     }
+  },
+
+  computed: {
+    ...mapGetters({
+      departments: 'globalValues/getDepartments',
+    }),
   },
 
   watch: {
@@ -113,7 +82,7 @@ export default {
       e.preventDefault()
       await this.form.validateFields(async (err, values) => {
         if (err) {
-          // TODO
+          this.$message.error('Please, fill all the required fields')
           return
         }
         // TODO add LOADING
@@ -122,6 +91,7 @@ export default {
             id: this.data?.id,
             ...this.data,
             ...values,
+            nameToFilter: values.name.toLowerCase(),
           })
           this.$emit('update', {
             id: this.data?.id,
@@ -131,6 +101,7 @@ export default {
         } else {
           const result = await FirebaseService.createOrEditItem('products', {
             ...values,
+            nameToFilter: values.name,
           })
           this.$emit('update', {
             id: result?.id,

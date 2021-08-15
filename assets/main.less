@@ -1,3 +1,26 @@
 .text-center {
   text-align: center;
 }
+
+.text-left {
+  text-align: left;
+}
+.text-right {
+  text-align: right;
+}
+
+@media print {
+  .no-print {
+    display: none;
+    position: relative;
+  }
+
+  .header-print {
+    position: fixed;
+    top: 0;
+  }
+
+  .department-orders {
+    margin-top: 80px;
+  }
+}

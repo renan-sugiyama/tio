@@ -8,200 +8,206 @@
     >
       <template slot="content">
         <a-form :form="form" layout="vertical" hide-required-mark>
-          <a-steps
-            :current="currentStep"
-            direction="vertical"
-            size="small"
-            @change="onStepChange"
-          >
-            <a-step title="Client Info">
-              <template slot="description">
-                <a-row v-show="currentStep === 0" :gutter="[8, 16]">
+          <section class="client-info-section">
+            <a-row :gutter="[8, 0]">
+              <a-col :span="24">
+                <h3>Client Info</h3>
+              </a-col>
+            </a-row>
+            <a-row :gutter="[8, 16]">
+              <a-col :span="24">
+                <TextFormItem
+                  :initial-value="data.contactName"
+                  decorator="contactName"
+                  label="Client Name"
+                  placeholder=""
+                  required
+                  message="This field is required"
+                />
+              </a-col>
+
+              <a-col :span="12">
+                <TextFormItem
+                  :initial-value="data.contactPhone"
+                  decorator="contactPhone"
+                  label="Phone number"
+                  placeholder=""
+                  required
+                  message="This field is required"
+                />
+              </a-col>
+
+              <a-col :span="12">
+                <TextFormItem
+                  :initial-value="data.contactEmail"
+                  decorator="contactEmail"
+                  label="E-mail"
+                  placeholder=""
+                  :required="false"
+                />
+              </a-col>
+            </a-row>
+          </section>
+
+          <a-divider type="horizontal" />
+
+          <section class="products-section">
+            <a-row :gutter="[8, 0]">
+              <a-col :span="24">
+                <h3>Products</h3>
+              </a-col>
+            </a-row>
+
+            <a-row>
+              <a-col :span="24">
+                <a-button type="primary" @click="addProduct">
+                  Add product
+                </a-button>
+              </a-col>
+
+              <a-col :span="24">
+                <a-row
+                  v-for="(product, index) in form.getFieldValue('products')"
+                  :key="`${product.id}_${index}`"
+                  :gutter="[16, 12]"
+                  type="flex"
+                  align="middle"
+                >
                   <a-col :span="24">
-                    <TextFormItem
-                      :initial-value="data.contactName"
-                      decorator="contactName"
-                      label="Client Name"
-                      placeholder=""
-                      required
-                      message="This field is required"
-                    />
+                    <hr v-if="index !== 0" />
                   </a-col>
 
-                  <a-col :span="24">
-                    <TextFormItem
-                      :initial-value="data.contactPhone"
-                      decorator="contactPhone"
-                      label="Phone number"
-                      placeholder=""
-                      required
-                      message="This field is required"
-                    />
-                  </a-col>
-
-                  <a-col :span="24">
-                    <TextFormItem
-                      :initial-value="data.contactEmail"
-                      decorator="contactEmail"
-                      label="E-mail"
-                      placeholder=""
-                      :required="false"
-                    />
-                  </a-col>
-                </a-row>
-              </template>
-            </a-step>
-
-            <a-step title="Produtos">
-              <template slot="description">
-                <a-row v-show="currentStep === 1">
-                  <a-col :span="24">
-                    <a-button type="primary" @click="addProduct">
-                      Add product
-                    </a-button>
-                  </a-col>
-
-                  <a-col :span="24">
-                    <a-row
-                      v-for="(product, index) in form.getFieldValue('products')"
-                      :key="`${product.id}_${index}`"
-                      :gutter="[16, 12]"
-                      type="flex"
-                      align="middle"
-                    >
+                  <a-col :span="22">
+                    <a-row :gutter="[8, 12]">
                       <a-col :span="24">
-                        <hr v-if="index !== 0" />
-                      </a-col>
-
-                      <a-col :span="22">
-                        <a-row :gutter="[8, 12]">
-                          <a-col :span="16">
-                            <SelectFormItem
-                              :initial-value="product.name"
-                              :options="productOptions"
-                              :decorator="`productName_${index}`"
-                              label="Product name"
-                              placeholder=""
-                              required
-                              message="This field is required"
-                              @change="
-                                (value) => updateSelectedProduct(index, value)
-                              "
-                            />
-                          </a-col>
-
-                          <a-col v-if="product.name" :span="8">
-                            <SelectFormItem
-                              :initial-value="
-                                product.department && product.department.name
-                              "
-                              :options="departmentOptions"
-                              :decorator="`productDepartment_${index}`"
-                              label="Department"
-                              placeholder=""
-                              required
-                              disabled
-                              message="This field is required"
-                              @change="
-                                (value, options) =>
-                                  updateProductDepartment(
-                                    index,
-                                    value,
-                                    'department'
-                                  )
-                              "
-                            />
-                          </a-col>
-
-                          <template v-if="product.name">
-                            <a-col :span="8">
-                              <NumberFormItem
-                                :initial-value="product.quantity"
-                                :min="0"
-                                :precision="2"
-                                :decorator="`productQuantity_${index}`"
-                                label="Quantity"
-                                placeholder=""
-                                required
-                                message="This field is required"
-                                @change="
-                                  (value) =>
-                                    updateProduct(index, value, 'quantity')
-                                "
-                              />
-                            </a-col>
-
-                            <a-col :span="8">
-                              <SelectFormItem
-                                :initial-value="product.measurement"
-                                :options="measurements"
-                                :decorator="`productMeasurement_${index}`"
-                                label="Measurement"
-                                placeholder=""
-                                required
-                                message="This field is required"
-                                @change="
-                                  (value) =>
-                                    updateProduct(index, value, 'measurement')
-                                "
-                              />
-                            </a-col>
-                          </template>
-                        </a-row>
-                      </a-col>
-
-                      <a-col :span="2" style="text-align: center">
-                        <a-icon
-                          style="color: #a33"
-                          type="minus-circle-o"
-                          @click="() => removeProduct(index)"
+                        <SelectFormItem
+                          :initial-value="product.name"
+                          :options="productOptions"
+                          :decorator="`productName_${index}`"
+                          label="Product name"
+                          placeholder=""
+                          required
+                          message="This field is required"
+                          @change="
+                            (value) => updateSelectedProduct(index, value)
+                          "
                         />
                       </a-col>
+
+                      <template v-if="product.name">
+                        <a-col v-if="product.name" :span="8">
+                          <SelectFormItem
+                            :initial-value="
+                              product.department && product.department.name
+                            "
+                            :options="departmentOptions"
+                            :decorator="`productDepartment_${index}`"
+                            label="Department"
+                            placeholder=""
+                            required
+                            disabled
+                            message="This field is required"
+                            @change="
+                              (value, options) =>
+                                updateProductDepartment(
+                                  index,
+                                  value,
+                                  'department'
+                                )
+                            "
+                          />
+                        </a-col>
+                        <a-col :span="8">
+                          <NumberFormItem
+                            :initial-value="product.quantity"
+                            :min="0"
+                            :precision="2"
+                            :decorator="`productQuantity_${index}`"
+                            label="Quantity"
+                            placeholder=""
+                            required
+                            message="This field is required"
+                            @change="
+                              (value) => updateProduct(index, value, 'quantity')
+                            "
+                          />
+                        </a-col>
+
+                        <a-col :span="8">
+                          <SelectFormItem
+                            :initial-value="product.measurement"
+                            :options="measurements"
+                            :decorator="`productMeasurement_${index}`"
+                            label="Measurement"
+                            placeholder=""
+                            required
+                            message="This field is required"
+                            @change="
+                              (value) =>
+                                updateProduct(index, value, 'measurement')
+                            "
+                          />
+                        </a-col>
+                      </template>
                     </a-row>
                   </a-col>
-                </a-row>
-              </template>
-            </a-step>
 
-            <a-step title="Additional Info">
-              <template slot="description">
-                <a-row v-show="currentStep === 2" :gutter="[8, 16]">
-                  <a-col :span="12">
-                    <DateFormItem
-                      :initial-value="initialDeliveryDate"
-                      decorator="deliveryDate"
-                      label="Delivery date"
-                      placeholder=""
-                      required
-                      message="This field is required"
-                    />
-                  </a-col>
-
-                  <a-col :span="12">
-                    <SelectFormItem
-                      :initial-value="data.deliveryPeriod"
-                      :options="deliveryPeriods"
-                      decorator="deliveryPeriod"
-                      label="Delivery Period"
-                      placeholder=""
-                      :required="false"
-                    />
-                  </a-col>
-
-                  <a-col :span="24">
-                    <TextAreaFormItem
-                      :initial-value="data.note"
-                      decorator="note"
-                      :label="`Note (${actualNoteLength} / 100)`"
-                      placeholder=""
-                      :autosize="{ minRows: 3 }"
-                      @change="updateNoteLength"
+                  <a-col :span="2" style="text-align: center">
+                    <a-icon
+                      style="color: #a33"
+                      type="minus-circle-o"
+                      @click="() => removeProduct(index)"
                     />
                   </a-col>
                 </a-row>
-              </template>
-            </a-step>
-          </a-steps>
+              </a-col>
+            </a-row>
+          </section>
+
+          <a-divider type="horizontal" />
+
+          <section class="additional-info-section">
+            <a-row :gutter="[8, 0]">
+              <a-col :span="24">
+                <h3>Additional Info</h3>
+              </a-col>
+            </a-row>
+
+            <a-row :gutter="[8, 16]">
+              <a-col :span="12">
+                <DateFormItem
+                  :initial-value="initialDeliveryDate"
+                  decorator="deliveryDate"
+                  label="Delivery date"
+                  placeholder=""
+                  required
+                  message="This field is required"
+                />
+              </a-col>
+
+              <a-col :span="12">
+                <SelectFormItem
+                  :initial-value="data.deliveryPeriod"
+                  :options="deliveryPeriods"
+                  decorator="deliveryPeriod"
+                  label="Delivery Period"
+                  placeholder=""
+                  :required="false"
+                />
+              </a-col>
+
+              <a-col :span="24">
+                <TextAreaFormItem
+                  :initial-value="data.note"
+                  decorator="note"
+                  :label="`Note (${actualNoteLength} / 100)`"
+                  placeholder=""
+                  :autosize="{ minRows: 3 }"
+                  @change="updateNoteLength"
+                />
+              </a-col>
+            </a-row>
+          </section>
         </a-form>
       </template>
 
@@ -271,7 +277,6 @@ export default {
     return {
       loading: false,
       actualNoteLength: this.data.note?.length || 0,
-      currentStep: 0,
       productOptions: [],
       clientOptions: [],
       departmentOptions: [],
@@ -312,10 +317,6 @@ export default {
   methods: {
     updateNoteLength($event) {
       this.actualNoteLength = $event?.target?.value?.length
-    },
-
-    onStepChange(nextStep) {
-      if (typeof nextStep === typeof 0) this.currentStep = nextStep
     },
 
     async getDepartmentList() {

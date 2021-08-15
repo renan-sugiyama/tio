@@ -40,6 +40,12 @@ export default {
       currentValue: this.value,
     }
   },
+
+  watch: {
+    value(newValue) {
+      this.currentValue = newValue
+    },
+  },
 }
 </script>
 

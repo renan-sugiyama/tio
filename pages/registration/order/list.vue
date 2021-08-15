@@ -1,8 +1,5 @@
 <template>
   <div class="list">
-    <OrderVisualizationModal ref="orderVisualizationModal" />
-    <OrdersVisualizationModal ref="ordersVisualizationModal" />
-
     <TheTable
       collection="orders"
       :columns="columns"
@@ -10,14 +7,13 @@
       :header-actions="headerActions"
       :result-actions="resultActions"
       :updated-element="updatedElement"
-      :has-department="true"
-      table-title="TODO Lista de produtos"
+      table-title="Order list"
+      @filtersApplied="updateFiltersApplied"
     />
 
     <OrderEditMode
       v-if="isDrawerVisible"
       :data="editItem"
-      :measurement-options="measurementOptions"
       :visible="isDrawerVisible"
       @close="closeEditDrawer"
       @update="updateElement"
@@ -26,36 +22,43 @@
 </template>
 
 <script>
-import FirebaseService from '~/service/firebase'
-import OrderVisualizationModal from '~/components/orders/OrderVisualizationModal.vue'
-import OrdersVisualizationModal from '~/components/orders/OrdersVisualizationModal.vue'
+import moment from 'moment'
 import OrderEditMode from '~/components/orders/OrderEditMode'
 import TheTable from '~/components/common/TheTable'
 import { filterOperators } from '~/enums/filterOperators'
-import { ordersDataMock } from '~/teste'
 
 export default {
   components: {
     TheTable,
     OrderEditMode,
-    OrderVisualizationModal,
-    OrdersVisualizationModal,
   },
 
   data() {
     return {
-      // TODO colocar na store?
-      dataToPrint: [],
-      measurementOptions: [],
       isDrawerVisible: false,
       editItem: {},
       filtersOptions: [
         {
           value: '',
-          label: 'Client Name',
-          fieldName: 'contactName',
+          label: 'Order Number',
+          fieldName: 'orderNumber',
+          operator: filterOperators.EQUALS,
+          type: 'number',
+        },
+        {
+          value: '',
+          label: 'Client Name Start With',
+          fieldName: 'contactNameToFilter',
           operator: filterOperators.INCLUDES,
           type: 'string',
+        },
+        {
+          value: moment(),
+          label: 'Delivery Date',
+          fieldName: 'deliveryDate',
+          allowClear: false,
+          operator: filterOperators.EQUALS,
+          type: 'date',
         },
       ],
       updatedElement: {},
@@ -64,27 +67,20 @@ export default {
           title: 'Order Number',
           dataIndex: 'orderNumber',
           fixed: 'left',
-          sorter: true,
         },
         {
           title: 'Client Name',
           dataIndex: 'contactName',
           fixed: 'left',
-          sorter: true,
         },
         {
           title: 'Phone',
           dataIndex: 'contactPhone',
-          sorter: true,
         },
         {
           title: 'Delivery Date',
           dataIndex: 'deliveryDate',
           scopedSlots: { customRender: 'deliveryDate' },
-        },
-        {
-          title: 'Deliver Address',
-          dataIndex: 'deliverAddress',
         },
         {
           title: 'Created At',
@@ -106,7 +102,7 @@ export default {
       ],
       headerActions: [
         {
-          click: this.showEditDrawer,
+          click: this.showAddNewDrawer,
           label: 'New',
           icon: 'plus',
         },
@@ -122,31 +118,21 @@ export default {
           label: 'Edit',
         },
         {
-          click: this.openOrderVisualizationModal,
+          click: this.printOrder,
           label: 'Print',
         },
       ],
     }
   },
 
-  async mounted() {
-    await this.getMeasurementList()
-  },
-
   methods: {
-    // TODO colocar getMeasurementList na store e popular no momento que carregar a aplicacao
-    async getMeasurementList() {
-      const measurementList = await FirebaseService.getAllOnce(
-        'productsMeasurements'
-      )
-      this.measurementOptions = measurementList.map((measurement) => ({
-        name: measurement.name,
-        value: measurement.id,
-      }))
-    },
-
     showEditDrawer(item) {
       this.editItem = item
+      this.isDrawerVisible = true
+    },
+
+    showAddNewDrawer() {
+      this.editItem = {}
       this.isDrawerVisible = true
     },
 
@@ -160,22 +146,27 @@ export default {
       this.isDrawerVisible = false
     },
 
-    openOrderVisualizationModal(order) {
-      this.$refs.orderVisualizationModal.open(order)
+    updateFiltersApplied(filtersApplied) {
+      this.filtersOptions = filtersApplied
+    },
+
+    printOrder(order) {
+      const url = `/print-order/${order.orderNumber}`
+      window.open(url, '_blank', null, false)
     },
 
     printAll() {
-      try {
-        this.loading = true
-        // this.dataToPrint = await FirebaseService.getAllOnce('orders')
-        this.$refs.ordersVisualizationModal.open(ordersDataMock)
-        console.log('print all')
-      } catch (error) {
-        // TODO
-        console.log('rro', error)
-      } finally {
-        this.loading = false
+      const dateToPrint = this.filtersOptions.find(
+        (filter) => filter.fieldName === 'deliveryDate'
+      )
+      if (!dateToPrint?.value) {
+        this.$message.error(
+          'Sorry, something went wrong. Check if there is a date selected on the filters'
+        )
       }
+      const dateToPrintFormat = dateToPrint.value.format('YYYY-MM-DD')
+      const url = `/print-orders?date=${dateToPrintFormat}`
+      window.open(url, '_blank', null, false)
     },
   },
 }

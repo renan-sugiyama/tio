@@ -7,14 +7,12 @@
       :header-actions="headerActions"
       :result-actions="resultActions"
       :updated-element="updatedElement"
-      :has-department="true"
-      table-title="TODO Lista de produtos"
+      table-title="Product list"
     />
 
     <ProductEditMode
       v-if="isDrawerVisible"
       :data="editItem"
-      :departments="departments"
       :visible="isDrawerVisible"
       @close="closeEditDrawer"
       @update="updateElement"
@@ -23,7 +21,6 @@
 </template>
 
 <script>
-import FirebaseService from '~/service/firebase'
 import ProductEditMode from '~/components/products/ProductEditMode'
 import TheTable from '~/components/common/TheTable'
 import { filterOperators } from '~/enums/filterOperators'
@@ -36,14 +33,13 @@ export default {
 
   data() {
     return {
-      departments: [],
       isDrawerVisible: false,
       editItem: {},
       filtersOptions: [
         {
           value: '',
-          label: 'Name',
-          fieldName: 'name',
+          label: 'Name Start With',
+          fieldName: 'nameToFilter',
           operator: filterOperators.INCLUDES,
           type: 'string',
         },
@@ -53,12 +49,10 @@ export default {
         {
           title: 'Name',
           dataIndex: 'name',
-          sorter: true,
         },
         {
-          title: 'Departamento',
+          title: 'Department',
           dataIndex: 'departmentId',
-          sorter: true,
           scopedSlots: { customRender: 'departmentId' },
         },
         {
@@ -69,31 +63,28 @@ export default {
       ],
       headerActions: [
         {
-          click: this.showEditDrawer,
-          label: 'TODO Novo',
+          click: this.showAddNewDrawer,
+          label: 'New',
+          icon: 'plus',
         },
       ],
       resultActions: [
         {
           click: this.showEditDrawer,
-          label: 'TODO Editar',
+          label: 'Edit',
         },
       ],
     }
   },
 
-  async mounted() {
-    // TODO colocar getDepartmentsList na store e popular no momento que carregar a aplicacao
-    await this.getDepartmentsList()
-  },
-
   methods: {
-    async getDepartmentsList() {
-      this.departments = await FirebaseService.getAllOnce('departments')
-    },
-
     showEditDrawer(item) {
       this.editItem = item
+      this.isDrawerVisible = true
+    },
+
+    showAddNewDrawer() {
+      this.editItem = {}
       this.isDrawerVisible = true
     },
 

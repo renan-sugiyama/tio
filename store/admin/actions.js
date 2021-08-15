@@ -14,4 +14,7 @@ export default {
   login: async (_, { email, password }) => {
     await firebase.auth().signInWithEmailAndPassword(email, password)
   },
+  logout: async () => {
+    await firebase.auth().signOut()
+  },
 }

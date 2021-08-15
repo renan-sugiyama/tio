@@ -86,8 +86,6 @@ export default {
             })
             this.$router.push({ path: '/registration/order/list' })
           } catch (error) {
-            // TODO exibir msg de erro
-            console.log(error)
             this.$message.error(
               'Erro ao fazer login. Verifique usuário e senha'
             )

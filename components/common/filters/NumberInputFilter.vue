@@ -9,6 +9,7 @@
       :min="min"
       :max="max"
       class="input-field"
+      @keyup.enter="onKeyEnter"
       @change="$emit('input', currentValue)"
     />
   </div>
@@ -23,7 +24,7 @@ export default {
       required: true,
     },
     value: {
-      type: Number,
+      type: [Number, String],
       required: true,
     },
     placeholder: {
@@ -37,6 +38,10 @@ export default {
     max: {
       type: Number,
       default: Infinity,
+    },
+    onKeyEnter: {
+      type: Function,
+      default: () => ({}),
     },
   },
 

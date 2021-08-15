@@ -46,7 +46,7 @@ export default {
       default: '',
     },
     width: {
-      type: Number,
+      type: [Number, String],
       default: 720,
     },
     handleSubmit: {

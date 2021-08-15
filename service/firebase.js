@@ -38,7 +38,29 @@ class FirebaseService {
       }
     } catch (error) {
       // TODO?
-      console.log(error)
+    }
+  }
+
+  static async getListFiltered(collection, filters = []) {
+    const db = firebase.firestore()
+    let collectionRef = db.collection(collection)
+    filters.forEach((filter) => {
+      collectionRef = collectionRef.where(
+        filter.prop,
+        filter.operator,
+        filter.value
+      )
+    })
+
+    try {
+      const dataList = await collectionRef.get()
+      const dataListValues = []
+      dataList.forEach((doc) => {
+        dataListValues.push({ ...doc.data(), id: doc.id })
+      })
+      return dataListValues
+    } catch (error) {
+      // TODO?
     }
   }
 
@@ -70,6 +92,13 @@ class FirebaseService {
   }
 
   static async getItemById(collection, { id }) {
+    const db = firebase.firestore()
+    const docRef = db.collection(collection).doc(id)
+    const item = await docRef.get()
+    return item.exists ? item.data() : {}
+  }
+
+  static async getItemByFilter(collection, { id }) {
     const db = firebase.firestore()
     const docRef = db.collection(collection).doc(id)
     const item = await docRef.get()

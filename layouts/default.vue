@@ -3,11 +3,27 @@
     <the-sidebar :collapsed="collapsed" />
     <a-layout>
       <a-layout-header style="background: #fff; padding: 0">
-        <a-icon
-          class="trigger"
-          :type="collapsed ? 'menu-unfold' : 'menu-fold'"
-          @click="() => (collapsed = !collapsed)"
-        />
+        <div
+          style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+          "
+        >
+          <a-icon
+            class="trigger"
+            :type="collapsed ? 'menu-unfold' : 'menu-fold'"
+            @click="() => (collapsed = !collapsed)"
+          />
+          <a-popconfirm
+            title="Do you want to logout？"
+            ok-text="Yes"
+            cancel-text="No"
+            @confirm="logout"
+          >
+            <a-icon type="logout" class="logout-icon" />
+          </a-popconfirm>
+        </div>
       </a-layout-header>
       <a-layout-content>
         <div class="layout-content">
@@ -20,7 +36,8 @@
 
 <script>
 import { mapActions } from 'vuex'
-import TheSidebar from '../components/TheSidebar.vue'
+import TheSidebar from '~/components/TheSidebar.vue'
+import FirebaseService from '~/service/firebase'
 
 export default {
   components: { TheSidebar },
@@ -32,7 +49,12 @@ export default {
   beforeMount() {
     this.setIsMobile()
   },
-  mounted() {
+
+  async mounted() {
+    await this.getDepartmentsList()
+    await this.getMeasurementList()
+    await this.getDeliveryPeriod()
+
     this.$nextTick(() => {
       window.addEventListener('resize', this.setIsMobile)
     })
@@ -45,7 +67,48 @@ export default {
   methods: {
     ...mapActions({
       setIsMobile: 'configs/setIsMobile',
+      setDepartments: 'globalValues/setDepartments',
+      setMeasurements: 'globalValues/setMeasurements',
+      setDeliveryPeriods: 'globalValues/setDeliveryPeriods',
     }),
+
+    async getDepartmentsList() {
+      const departments = await FirebaseService.getAllOnce('departments')
+      this.setDepartments(departments)
+    },
+
+    async getMeasurementList() {
+      const measurementList = await FirebaseService.getAllOnce(
+        'productsMeasurements'
+      )
+      const measurements = measurementList.map((measurement) => ({
+        name: measurement.name,
+        value: measurement.id,
+      }))
+
+      this.setMeasurements(measurements)
+    },
+
+    async getDeliveryPeriod() {
+      const deliveryPeriodList = await FirebaseService.getAllOnce(
+        'deliveryPeriod'
+      )
+      const deliveryPeriods = deliveryPeriodList.map((deliveryPeriod) => ({
+        name: deliveryPeriod.name,
+        value: deliveryPeriod.id,
+      }))
+
+      this.setDeliveryPeriods(deliveryPeriods)
+    },
+
+    async logout() {
+      try {
+        await this.$store.dispatch('admin/logout')
+        this.$router.push({ path: '/login' })
+      } catch (error) {
+        this.$message.error('It was not possible to logout')
+      }
+    },
   },
 }
 </script>
@@ -73,5 +136,13 @@ export default {
 #default-layout .ant-layout-content {
   min-height: calc(100vh - @layout-header-height - @layout-footer-height);
   padding: 0 5px;
+}
+
+.logout-icon {
+  margin-right: 15px;
+  cursor: pointer;
+  &:hover {
+    color: @link-color;
+  }
 }
 </style>

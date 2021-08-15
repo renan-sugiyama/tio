@@ -5,6 +5,8 @@
     collapsible
     class="the-sidebar"
   >
+    <div class="logo" />
+
     <a-menu
       :default-selected-keys="[activeRoute]"
       mode="inline"
@@ -69,6 +71,9 @@ export default {
 
 <style lang="less" scoped>
 .the-sidebar {
+  .logo {
+    height: 60px;
+  }
   .sidebar-item {
     color: @sidebar-font-color;
   }

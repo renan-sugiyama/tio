@@ -22,7 +22,7 @@
           <thead class="head">
             <tr class="head-row">
               <th colspan="4" class="head-row-item">
-                data: {{ formatDateField(orderByDeparment.deliveryDate) }}
+                Date: {{ formatDateField(orderByDeparment.deliveryDate) }}
               </th>
             </tr>
             <tr class="head-row">

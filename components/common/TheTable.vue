@@ -4,7 +4,7 @@
       <a-row :gutter="[16, 16]" class="selectors">
         <form @submit.prevent="applyFilter">
           <a-col
-            v-for="filter in filtersOptions"
+            v-for="filter in filters"
             :key="filter.fieldName"
             :xs="{ span: 24 }"
             :md="{ span: 12 }"
@@ -13,16 +13,18 @@
           >
             <NumberInputFilter
               v-if="filter.type === 'number'"
-              v-model="filter.value"
+              :value="filter.value"
               :title="filter.label"
               :on-key-enter="applyFilter"
+              @input="(currentValue) => clearOtherFilters(currentValue, filter)"
             />
 
             <TextInputFilter
               v-if="filter.type === 'string'"
-              v-model="filter.value"
+              :value="filter.value"
               :title="filter.label"
               :on-key-enter="applyFilter"
+              @input="(currentValue) => clearOtherFilters(currentValue, filter)"
             />
 
             <DateInputFilter
@@ -59,10 +61,10 @@
     <a-table
       :columns="columns"
       :row-key="(record) => record.id"
-      :data-source="dataFiltered"
+      :data-source="dataSource"
       :loading="loading"
       :pagination="false"
-      :scroll="{ x: 1100 }"
+      :scroll="{ x: 700 }"
       class="table-component"
     >
       <template slot="createdAt" slot-scope="createdAt">
@@ -160,7 +162,7 @@ export default {
     return {
       dataSource: [],
       loading: false,
-      dataFiltered: [],
+      filters: [],
     }
   },
 
@@ -171,16 +173,35 @@ export default {
   },
 
   watch: {
+    filtersOptions(newFilters) {
+      this.filters = newFilters
+    },
+
     updatedElement(item) {
       this.updateListSync(item)
     },
   },
 
   mounted() {
-    this.getData(this.filtersOptions)
+    this.filters = [...this.filtersOptions]
+    this.getData(this.filters)
   },
 
   methods: {
+    clearOtherFilters(currentValue, filterChanged) {
+      this.filters = this.filters.map((filter) => {
+        if (filterChanged.fieldName === filter.fieldName) {
+          return { ...filter, value: currentValue }
+        } else if (filter.type === 'date') {
+          return filter
+        }
+        return {
+          ...filter,
+          value: '',
+        }
+      })
+    },
+
     formatDateField(dateTimestamp) {
       return moment(new Date(dateTimestamp)).format('DD/MMM/YYYY')
     },
@@ -237,6 +258,7 @@ export default {
 
     async getData(filtersOptions) {
       const filters = this.getFiltersMapped(filtersOptions)
+      console.log('filters', filters)
       try {
         this.loading = true
         const data = await FirebaseService.getListFiltered(
@@ -244,7 +266,6 @@ export default {
           filters
         )
         this.dataSource = data
-        this.dataFiltered = data
       } catch (error) {
         this.$message.error('Error trying to get the data')
       } finally {
@@ -285,8 +306,8 @@ export default {
     },
 
     async applyFilter() {
-      await this.getData(this.filtersOptions)
-      this.$emit('filtersApplied', this.filtersOptions)
+      await this.getData(this.filters)
+      this.$emit('filtersApplied', this.filters)
     },
   },
 }

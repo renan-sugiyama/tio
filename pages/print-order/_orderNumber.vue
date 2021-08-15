@@ -44,13 +44,13 @@
                 <tbody class="body">
                   <tr class="body-row">
                     <td colspan="6" class="body-row-item text-left">
-                      <strong>Nome:</strong> {{ order.contactName }}
+                      <strong>Name:</strong> {{ order.contactName }}
                     </td>
                   </tr>
 
                   <tr class="body-row">
                     <td colspan="6" class="body-row-item text-left">
-                      <strong>Telefone:</strong> {{ order.contactPhone }}
+                      <strong>Phone:</strong> {{ order.contactPhone }}
                     </td>
                   </tr>
 
@@ -65,15 +65,15 @@
           </tr>
 
           <tr class="head-row">
-            <th colspan="6" class="head-row-item"><strong>Produtos</strong></th>
+            <th colspan="6" class="head-row-item"><strong>Products</strong></th>
           </tr>
 
           <tr class="head-row">
             <th colspan="1" class="head-row-item">Deparment</th>
-            <th colspan="2" class="head-row-item">Nome</th>
-            <th colspan="1" class="head-row-item">Qtd Pedido</th>
-            <th colspan="1" class="head-row-item">Qtd Real</th>
-            <th colspan="1" class="head-row-item">Valor</th>
+            <th colspan="2" class="head-row-item">Name</th>
+            <th colspan="1" class="head-row-item">Order Qtd</th>
+            <th colspan="1" class="head-row-item">Real Qtd</th>
+            <th colspan="1" class="head-row-item">Value</th>
           </tr>
         </thead>
 

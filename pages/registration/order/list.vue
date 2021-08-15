@@ -39,6 +39,14 @@ export default {
       editItem: {},
       filtersOptions: [
         {
+          value: moment(),
+          label: 'Delivery Date',
+          fieldName: 'deliveryDate',
+          allowClear: false,
+          operator: filterOperators.EQUALS,
+          type: 'date',
+        },
+        {
           value: '',
           label: 'Order Number',
           fieldName: 'orderNumber',
@@ -51,14 +59,6 @@ export default {
           fieldName: 'contactNameToFilter',
           operator: filterOperators.INCLUDES,
           type: 'string',
-        },
-        {
-          value: moment(),
-          label: 'Delivery Date',
-          fieldName: 'deliveryDate',
-          allowClear: false,
-          operator: filterOperators.EQUALS,
-          type: 'date',
         },
       ],
       updatedElement: {},
@@ -108,7 +108,7 @@ export default {
         },
         {
           click: this.printAll,
-          label: 'Print',
+          label: 'Print by Department',
           icon: 'printer',
         },
       ],
